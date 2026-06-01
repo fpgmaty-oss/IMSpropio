@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Maestra - Walmart Style</title>
+    
+    <!-- PWA Manifest & Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Maestra">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#0071CE">
+
+    <!-- SheetJS for Excel Support -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- HTML5-QRCode for Barcode Scanning -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- JsBarcode for local barcode generation -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF & AutoTable for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        :root {
+            --walmart-blue: #0071CE;
+            --walmart-yellow: #FFC220;
+            --walmart-white: #FFFFFF;
+            --walmart-gray: #F2F8FD;
+            --walmart-text: #2E2E2E;
+            --walmart-border: #E0E0E0;
+            --walmart-shadow: rgba(0, 0, 0, 0.08);
+            --walmart-accent: #004C91;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--walmart-gray);
+            color: var(--walmart-text);
+            line-height: 1.6;
+        }
+
+        /* Walmart Header Styles */
+        .walmart-header {
+            background-color: var(--walmart-blue);
+            color: var(--walmart-white);
+            padding: 1.25rem 2rem;
+            box-shadow: 0 4px 10px var(--walmart-shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .walmart-logo-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--walmart-yellow);
+            mask: radial-gradient(circle, transparent 20%, black 21%);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        .header-content h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .help-btn-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--walmart-yellow);
+            color: var(--walmart-blue);
+            border: none;
+            border-radius: 50%;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .help-btn-icon:hover { transform: scale(1.2) rotate(10deg); }
+
+        .user-signature { text-align: right; border-left: 2px solid var(--walmart-yellow); padding-left: 1rem; }
+        .user-signature span { display: block; font-weight: 600; font-size: 1rem; }
+        .header-status { font-size: 0.7rem; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end; }
+        .btn-clear { background: #E57373; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; cursor: pointer; transition: background 0.2s; }
+        .btn-clear:hover { background: #D32F2F; }
+        .user-signature small { font-size: 0.8rem; color: var(--walmart-yellow); }
+
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; }
+        .card { background: var(--walmart-white); border-radius: 12px; padding: 2rem; border: 1px solid var(--walmart-border); transition: transform var(--transition-speed), box-shadow var(--transition-speed); }
+        .card.shadow-sm { box-shadow: 0 4px 12px var(--walmart-shadow); }
+
+        .upload-area { text-align: center; padding: 3rem; border: 2px dashed var(--walmart-blue); border-radius: 12px; background-color: rgba(0, 113, 206, 0.03); cursor: pointer; transition: background-color var(--transition-speed); }
+        .upload-area:hover { background-color: rgba(0, 113, 206, 0.08); }
+        .upload-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+
+        .btn { padding: 0.75rem 1.5rem; border-radius: 30px; font-weight: 600; cursor: pointer; border: none; transition: background-color var(--transition-speed), transform 0.1s; font-size: 0.95rem; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background-color: var(--walmart-blue); color: var(--walmart-white); }
+        .btn-primary:hover { background-color: var(--walmart-accent); }
+        .btn-secondary { background-color: var(--walmart-white); color: var(--walmart-blue); border: 1px solid var(--walmart-blue); }
+
+        .search-bar-container { padding: 1.5rem; margin-bottom: 1.5rem; position: sticky; top: 1rem; z-index: 100; display: flex; flex-direction: column; gap: 1rem; }
+        .search-input-wrapper { display: flex; align-items: center; background: #f8f9fa; border-radius: 40px; padding: 0 0.5rem 0 1.25rem; border: 1px solid var(--walmart-border); }
+        .search-input-wrapper input { flex: 1; border: none; background: transparent; padding: 1rem 0; font-size: 1.1rem; outline: none; }
+        .search-icon { font-size: 1.2rem; margin-right: 0.75rem; opacity: 0.6; }
+        .filters-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .form-select { padding: 0.6rem 1rem; border-radius: 20px; border: 1px solid var(--walmart-border); background-color: #fff; font-size: 0.9rem; flex: 1; min-width: 150px; }
+
+        .result-card { display: flex; flex-direction: column; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px var(--walmart-shadow); border-left: 6px solid var(--walmart-blue); margin-bottom: 1rem; transition: all 0.3s ease; cursor: pointer; overflow: hidden; }
+        .result-card:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.12); }
+        .card-main { display: grid; grid-template-columns: 140px 1fr auto; gap: 1.5rem; align-items: center; padding: 1.25rem 1.5rem; }
+        .card-detail { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.3s ease; background: #fdfdfe; border-top: 1px solid #eee; }
+        .card-detail.expanded { max-height: 800px; padding-top: 1.5rem; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; padding: 0 1.5rem 1.5rem; }
+        .info-item { display: flex; flex-direction: column; gap: 0.25rem; }
+        .info-item strong { font-size: 0.75rem; text-transform: uppercase; color: #666; letter-spacing: 0.5px; }
+        .info-item span { font-weight: 600; color: var(--walmart-text); font-size: 0.95rem; }
+        .barcode-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1rem; background: #fff; border-radius: 8px; border: 1px solid #eee; margin-top: 1rem; }
+        .barcode-container canvas, .barcode-container svg { max-width: 100%; }
+        .item-footer { background: #f8f9fa; padding: 0.6rem 1.5rem; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.9rem; color: var(--walmart-blue); }
+        .item-number { background: var(--walmart-blue); color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; }
+
+        .result-info h3 { font-size: 1.05rem; color: var(--walmart-text); margin-bottom: 0.2rem; }
+        .result-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .tag { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+        .tag-dept { background: #E3F2FD; color: #1976D2; }
+        .tag-pps { background: #FFF9C4; color: #FBC02D; }
+        .tag-adj { background: #E8EAF6; color: #3F51B5; }
+        .tag-no-adj { background: #EEEEEE; color: #757575; }
+        .tag-status { background: #F3E5F5; color: #8E24AA; }
+
+        .result-price { font-size: 1.25rem; font-weight: 800; color: var(--walmart-blue); }
+        .stats-bar { display: flex; justify-content: space-between; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: #666; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #fff; width: 90%; max-width: 500px; border-radius: 12px; overflow: hidden; }
+        .modal-header { padding: 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--walmart-border); }
+        .btn-close { background: none; border: none; font-size: 2rem; cursor: pointer; }
+        #reader { width: 100%; background: #000; }
+
+        .help-modal-content { max-width: 600px; }
+        .walmart-blue-bg { background-color: var(--walmart-blue) !important; color: white !important; }
+        .modal-tabs { display: flex; border-bottom: 1px solid var(--walmart-border); background: #f8f9fa; }
+        .tab-btn { flex: 1; padding: 1rem; border: none; background: none; cursor: pointer; font-weight: 600; color: #666; }
+        .tab-btn.active { color: var(--walmart-blue); border-bottom: 3px solid var(--walmart-blue); background: white; }
+        .tab-content { padding: 2rem; max-height: 400px; overflow-y: auto; }
+        .help-list { list-style: none; }
+        .help-list li { margin-bottom: 1rem; padding-left: 1.5rem; position: relative; }
+        .help-list li::before { content: "🔵"; position: absolute; left: 0; font-size: 0.7rem; top: 0.3rem; }
+        .glossary-grid { display: flex; flex-direction: column; gap: 1rem; }
+        .glossary-item { padding: 0.75rem; background: #f1f8ff; border-radius: 8px; font-size: 0.9rem; }
+        .glossary-item strong { color: var(--walmart-blue); display: block; margin-bottom: 0.2rem; }
+
+        .walmart-footer { text-align: center; padding: 2.5rem 0; margin-top: 4rem; background: var(--walmart-white); border-top: 2px solid var(--walmart-yellow); }
+        .signature-footer { margin-top: 0.5rem; color: var(--walmart-blue); font-style: italic; }
+        .hidden { display: none !important; }
+
+        /* Main Navigation */
+        .main-nav {
+            background: white;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--walmart-border);
+            position: sticky;
+            top: 0;
+            z-index: 101;
+            box-shadow: 0 2px 4px var(--walmart-shadow);
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .nav-btn.active {
+            color: var(--walmart-blue);
+            border-bottom-color: var(--walmart-blue);
+        }
+        .nav-btn:hover {
+            background: rgba(0, 113, 206, 0.05);
+        }
+
+        /* Materiales styles */
+        .purchase-log-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .purchase-history {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f1f8ff;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        .purchase-history h4 {
+            color: var(--walmart-blue);
+            margin-bottom: 0.5rem;
+        }
+        .purchase-list {
+            list-style: none;
+        }
+        .purchase-list li {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 4px 0;
+        }
+
+        /* Conteo Semanal styles */
+        .conteo-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .conteo-input-area textarea {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            border: 1px solid var(--walmart-border);
+            border-radius: 8px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        .conteo-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-animation { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        .pulse-animation { animation: pulse-animation 2s infinite ease-in-out; }
+
+        @media (max-width: 600px) {
+            .header-content h1 { font-size: 1.2rem; }
+            .user-signature { display: none; }
+            .card-main { grid-template-columns: 1fr; text-align: center; gap: 1rem; }
+            .result-tags { justify-content: center; }
+            .main-nav { overflow-x: auto; justify-content: flex-start; }
+            .nav-btn { white-space: nowrap; padding: 0.6rem 0.8rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="walmart-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="walmart-logo-icon"></div>
+                <h1>Buscador de Maestra</h1>
+                <button id="help-btn" class="help-btn-icon" title="Ayuda y Glosario">?</button>
+            </div>
+            <div class="user-signature">
+                <div class="header-status">
+                    <span id="last-load-status">Sin datos cargados</span>
+                    <button id="clear-data-btn" class="btn-clear hidden" title="Borrar Maestra Guardada">🗑️ Borrar</button>
+                </div>
+                <span>Matias Sepulveda</span>
+                <small>Jefe de Sala</small>
+            </div>
+        </div>
+    </header>
+
+    <nav class="main-nav hidden" id="main-nav">
+        <button class="nav-btn active" data-nav="search">🔍 Buscador</button>
+        <button class="nav-btn" data-nav="materiales">🛠️ Materiales Local</button>
+        <button class="nav-btn" data-nav="conteo">📋 Conteo Semanal</button>
+    </nav>
+
+    <main class="container">
+        <!-- Initial Upload State -->
+        <section id="upload-section" class="card shadow-sm pulse-animation">
+            <div class="upload-area" id="drop-zone">
+                <div class="upload-icon">📄</div>
+                <h2>Cargar Maestra de Tienda</h2>
+                <p>Arrastra tu archivo Excel aquí o haz clic para subir</p>
+                <input type="file" id="file-input" accept=".xlsx, .xls, .csv" hidden>
+                <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Seleccionar Archivo</button>
+            </div>
+        </section>
+
+        <!-- Main Search and Filters -->
+        <section id="search-section" class="hidden">
+            <div class="search-bar-container card shadow-sm sticky-top">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input" placeholder="Buscar por SKU, Nombre o ITEM...">
+                    <button id="scan-btn" class="btn btn-secondary" title="Escanear Código">
+                        <span class="icon">📷</span>
+                    </button>
+                </div>
+
+                <div class="filters-row">
+                    <select id="dept-filter" class="form-select">
+                        <option value="">Todos los Deptos (N° DPTO)</option>
+                    </select>
+                    <select id="marca-filter" class="form-select">
+                        <option value="">Todas las Marcas</option>
+                    </select>
+                    <select id="status-filter" class="form-select">
+                        <option value="">Cualquier Status</option>
+                    </select>
+                    <select id="categoria-filter" class="form-select">
+                        <option value="">Todas las Categorías</option>
+                    </select>
+                    <button id="download-pdf" class="btn btn-secondary" title="Exportar PDF con Código de Barras">📄 PDF</button>
+                    <button id="reset-filters" class="btn btn-text">Limpiar</button>
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <span id="results-count">Encontrados: 0</span>
+                <span id="total-rows">Total: 0</span>
+            </div>
+
+            <div id="results-list" class="results-grid"></div>
+
+            <div id="loading-spinner" class="spinner-container hidden">
+                <div class="spinner"></div>
+                <p>Procesando datos...</p>
+            </div>
+        </section>
+
+        <!-- Materiales Sala Section -->
+        <section id="materiales-section" class="hidden">
+            <div class="card shadow-sm" style="margin-bottom: 2rem;">
+                <h2>🛠️ Gestión de Materiales Sala</h2>
+                <p>Items filtrados automáticamente por Departamento 99.</p>
+            </div>
+            <div id="materiales-list" class="results-grid"></div>
+        </section>
+
+        <!-- Conteo Semanal Section -->
+        <section id="conteo-section" class="hidden">
+            <div class="card shadow-sm conteo-container">
+                <h2>📋 Conteo Semanal de Items</h2>
+                <div class="conteo-input-area">
+                    <p>Pega aquí la lista de SKUs o ITEMS (uno por línea):</p>
+                    <textarea id="conteo-input-list" placeholder="Ej:&#10;780123456789&#10;123456&#10;..."></textarea>
+                </div>
+                <div class="conteo-actions">
+                    <button id="btn-process-conteo" class="btn btn-primary">Filtrar Lista</button>
+                    <button id="btn-conteo-pdf" class="btn btn-secondary hidden">📄 Exportar PDF Conteo</button>
+                </div>
+            </div>
+            <div id="conteo-results-list" class="results-grid" style="margin-top: 2rem;"></div>
+        </section>
+
+        <!-- Scanner Modal -->
+
+        <!-- Scanner Modal -->
+        <div id="scanner-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Escanear Código de Barras</h3>
+                    <button id="close-scanner" class="btn-close">&times;</button>
+                </div>
+                <div id="reader"></div>
+            </div>
+        </div>
+
+        <!-- Help / Glossary Modal -->
+        <div id="help-modal" class="modal hidden">
+            <div class="modal-content help-modal-content">
+                <div class="modal-header walmart-blue-bg">
+                    <h3>Centro de Ayuda - Gestión de Sala</h3>
+                    <button id="close-help" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-tabs">
+                    <button class="tab-btn active" data-tab="guide">Guía de Uso</button>
+                    <button class="tab-btn" data-tab="glossary">Glosario</button>
+                </div>
+                <div class="tab-content" id="guide-tab">
+                    <ul class="help-list">
+                        <li><strong>1. Carga de Archivo:</strong> Arrastra el Excel `data (11).xlsx` al panel inicial. El programa recordará los datos automáticamente.</li>
+                        <li><strong>2. Búsqueda:</strong> Busca por SKU, Nombre o N° de ITEM.</li>
+                        <li><strong>3. Filtros:</strong> Filtra por Departamento o Marca específica.</li>
+                        <li><strong>4. Escaneo:</strong> Usa la cámara 📷 para escanear etiquetas en sala.</li>
+                        <li><strong>5. Ficha Técnica:</strong> Toca cualquier producto para ver el <strong>Costo</strong>, Proveedor y el código de barras visual.</li>
+                        <li><strong>6. Ajustes:</strong> Clic en "✅ Ajustado" para ver la fecha del último ajuste.</li>
+                    </ul>
+                </div>
+                <div class="tab-content hidden" id="glossary-tab">
+                    <div class="glossary-grid">
+                        <div class="glossary-item"><strong>Status A:</strong> Producto Activo.</div>
+                        <div class="glossary-item"><strong>Status I:</strong> Producto Inactivo.</div>
+                        <div class="glossary-item"><strong>Status D:</strong> Producto Discontinuado (no se repone).</div>
+                        <div class="glossary-item"><strong>Status S:</strong> Producto Suspendido.</div>
+                        <div class="glossary-item"><strong>ITEM:</strong> Código interno principal.</div>
+                        <div class="glossary-item"><strong>PPS:</strong> Posicionamiento en Sala.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="walmart-footer">
+        <p>&copy; 2026 - Sistema de Gestión de Etiquetas</p>
+        <p class="signature-footer">Desarrollado para: <strong>Matias Sepulveda - Jefe de Sala</strong></p>
+    </footer>
+
+    <script>
+        // Global Store
+        let storeData = [];
+        let filteredData = [];
+        const rowsPerPage = 50;
+        let currentPage = 1;
+        let expandedItemId = null;
+
+        // IndexedDB Configuration
+        const DB_NAME = 'WalmartMaestraDB';
+        const STORE_NAME = 'maestra_data';
+        const PURCHASE_STORE = 'purchases';
+        const DB_VERSION = 2;
+
+        // Elements
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const uploadSection = document.getElementById('upload-section');
+        const searchSection = document.getElementById('search-section');
+        const searchInput = document.getElementById('search-input');
+        const resultsList = document.getElementById('results-list');
+        const deptFilter = document.getElementById('dept-filter');
+        const marcaFilter = document.getElementById('marca-filter');
+        const statusFilter = document.getElementById('status-filter');
+        const categoriaFilter = document.getElementById('categoria-filter');
+        const resultsCount = document.getElementById('results-count');
+        const totalRowsSpan = document.getElementById('total-rows');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const scanBtn = document.getElementById('scan-btn');
+        const scannerModal = document.getElementById('scanner-modal');
+        const closeScanner = document.getElementById('close-scanner');
+        const lastLoadStatus = document.getElementById('last-load-status');
+        const clearDataBtn = document.getElementById('clear-data-btn');
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const closeHelp = document.getElementById('close-help');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const mainNav = document.getElementById('main-nav');
+        const mainNavBtns = document.querySelectorAll('[data-nav]');
+        const sections = {
+            search: document.getElementById('search-section'),
+            materiales: document.getElementById('materiales-section'),
+            conteo: document.getElementById('conteo-section')
+        };
+        const materialesList = document.getElementById('materiales-list');
+        const conteoInputList = document.getElementById('conteo-input-list');
+        const btnProcessConteo = document.getElementById('btn-process-conteo');
+        const btnConteoPdf = document.getElementById('btn-conteo-pdf');
+        const conteoResultsList = document.getElementById('conteo-results-list');
+        
+        let conteoFilteredData = [];
+
+        function init() {
+            setupEventListeners();
+            loadFromPersistence();
+            registerServiceWorker();
+        }
+
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then((reg) => console.log('Service Worker registrado.', reg.scope))
+                        .catch((err) => console.error('Error al registrar Service Worker.', err));
+                });
+            }
+        }
+
+        function setupEventListeners() {
+            dropZone.onclick = () => fileInput.click();
+            fileInput.onchange = (e) => handleFile(e.target.files[0]);
+            dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); };
+            dropZone.ondragleave = () => dropZone.classList.remove('drag-over');
+            dropZone.ondrop = (e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); };
+
+            searchInput.oninput = debounce(() => applyFilters(), 300);
+            deptFilter.onchange = () => applyFilters();
+            marcaFilter.onchange = () => applyFilters();
+            statusFilter.onchange = () => applyFilters();
+            categoriaFilter.onchange = () => applyFilters();
+            document.getElementById('reset-filters').onclick = resetFilters;
+
+            scanBtn.onclick = openScanner;
+            closeScanner.onclick = closeScannerModal;
+            clearDataBtn.onclick = clearPersistence;
+            
+            helpBtn.onclick = () => helpModal.classList.remove('hidden');
+            closeHelp.onclick = () => helpModal.classList.add('hidden');
+            tabBtns.forEach(btn => { btn.onclick = () => switchTab(btn.dataset.tab); });
+            mainNavBtns.forEach(btn => { btn.onclick = () => switchMainTab(btn.dataset.nav); });
+            
+            btnProcessConteo.onclick = processConteoList;
+            btnConteoPdf.onclick = () => generatePDF(conteoFilteredData, "Conteo_Semanal");
+
+            window.onscroll = () => {
+                const activeSection = Object.keys(sections).find(k => !sections[k].classList.contains('hidden'));
+                if (activeSection === 'search' && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                    if (filteredData.length > currentPage * rowsPerPage) {
+                        currentPage++;
+                        renderResults(true);
+                    }
+                }
+            };
+        }
+
+        // IndexedDB
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+                    if (!db.objectStoreNames.contains(PURCHASE_STORE)) db.createObjectStore(PURCHASE_STORE);
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function saveToPersistence(data) {
+            try {
+                const db = await openDB();
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                await store.put(data, 'current_maestra');
+                const time = new Date().toLocaleString();
+                await store.put(time, 'last_upload_time');
+                updatePersistenceUI(time);
+            } catch (err) { console.error(err); }
+        }
+
+        async function loadFromPersistence() {
+            try {
+                const db = await openDB();
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const data = await getRequest(store.get('current_maestra'));
+                const time = await getRequest(store.get('last_upload_time'));
+                if (data && data.length > 0) {
+                    storeData = data;
+                    updatePersistenceUI(time);
+                    showSearchUI();
+                } else {
+                    await loadDefaultMaestra();
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function loadDefaultMaestra() {
+            const statusText = document.querySelector('#drop-zone p');
+            const originalText = statusText ? statusText.innerText : 'Arrastra tu archivo Excel aquí o haz clic para subir';
+            try {
+                if (statusText) statusText.innerText = "Buscando Maestra predeterminada en el servidor...";
+                
+                let response = await fetch('Maestra.xlsx');
+                if (!response.ok) {
+                    // Fallback a minúscula si falla Maestra.xlsx con mayúscula
+                    response = await fetch('maestra.xlsx');
+                }
+                
+                if (!response.ok) {
+                    if (statusText) statusText.innerText = originalText;
+                    return; // Si no existe en el servidor, permitimos carga manual silenciosamente
+                }
+                
+                if (statusText) statusText.innerText = "Descargando Maestra del servidor...";
+                loadingSpinner.classList.remove('hidden');
+                uploadSection.classList.add('hidden');
+                
+                const buffer = await response.arrayBuffer();
+                const data = new Uint8Array(buffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                
+                storeData = jsonData.map((item, index) => {
+                    const getCleanSku = () => {
+                        const fields = [item['BARCODE'], item['UPC MAESTRA'], item['ITEM']];
+                        for (let f of fields) if (f && !String(f).startsWith('http')) return f;
+                        return item['ITEM'] || 'N/A';
+                    };
+                    return {
+                        id: index, sku: getCleanSku(), description: item['DESCRIPCIÓN'] || 'Sin Descripción',
+                        price: item['RETAIL'] || 0, dept: item['N° DPTO'] || 'Gral', marca: item['MARCA'] || 'N/A',
+                        status: item['STATUS'] || 'N/A', stock: item['STOCK'] || 0, itemNum: item['ITEM'] || 'N/A',
+                        segmento: item['SEGMENTO'] || 'N/A', categoria: item['CATEGORIA'] || 'N/A',
+                        subcategoria: item['SUB CATEGORIA'] || 'N/A', proveedor: item['PROVEEDOR'] || 'N/A',
+                        caja: item['QTY X CAJA'] || '1', ajustado: item['AJUSTADO?'] || 'N',
+                        ultAjuste: formatExcelDate(item['ULT AJUSTE']), costo: item['COSTO'] || 0
+                    };
+                });
+                
+                await saveToPersistence(storeData);
+                showSearchUI();
+            } catch (err) {
+                console.error("Error al cargar la maestra predeterminada:", err);
+                if (statusText) statusText.innerText = originalText;
+                uploadSection.classList.remove('hidden');
+            } finally {
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        async function clearPersistence() {
+            if (!confirm("¿Borrar maestra?")) return;
+            const db = await openDB();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).clear();
+            location.reload();
+        }
+
+        function getRequest(request) { return new Promise((resolve, reject) => { request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); }
+
+        function updatePersistenceUI(time) {
+            if (time) { lastLoadStatus.innerText = `Cargado: ${time}`; clearDataBtn.classList.remove('hidden'); }
+            else { lastLoadStatus.innerText = `Sin datos`; clearDataBtn.classList.add('hidden'); }
+        }
+
+        // New Purchase Logging Functions
+        async function savePurchase(sku, qty) {
+            const db = await openDB();
+            const tx = db.transaction(PURCHASE_STORE, 'readwrite');
+            const store = tx.objectStore(PURCHASE_STORE);
+            const purchases = await getRequest(store.get(sku)) || [];
+            purchases.push({ qty, date: new Date().toLocaleString() });
+            await store.put(purchases, sku);
+        }
+
+        async function getPurchases(sku) {
+            const db = await openDB();
+            const tx = db.transaction(PURCHASE_STORE, 'readonly');
+            const store = tx.objectStore(PURCHASE_STORE);
+            return await getRequest(store.get(sku)) || [];
+        }
+
+        function showSearchUI() {
+            uploadSection.classList.add('hidden');
+            mainNav.classList.remove('hidden');
+            switchMainTab('search');
+            populateFilters();
+            totalRowsSpan.innerText = `Total: ${storeData.length}`;
+            applyFilters();
+        }
+
+        function switchMainTab(target) {
+            Object.values(sections).forEach(s => s.classList.add('hidden'));
+            mainNavBtns.forEach(b => b.classList.toggle('active', b.dataset.nav === target));
+            sections[target].classList.remove('hidden');
+            
+            if (target === 'materiales') renderMateriales();
+        }
+
+        async function handleFile(file) {
+            if (!file) return;
+            loadingSpinner.classList.remove('hidden');
+            uploadSection.classList.add('hidden');
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    storeData = jsonData.map((item, index) => {
+                        const getCleanSku = () => {
+                            const fields = [item['BARCODE'], item['UPC MAESTRA'], item['ITEM']];
+                            for (let f of fields) if (f && !String(f).startsWith('http')) return f;
+                            return item['ITEM'] || 'N/A';
+                        };
+                        return {
+                            id: index, sku: getCleanSku(), description: item['DESCRIPCIÓN'] || 'Sin Descripción',
+                            price: item['RETAIL'] || 0, dept: item['N° DPTO'] || 'Gral', marca: item['MARCA'] || 'N/A',
+                            status: item['STATUS'] || 'N/A', stock: item['STOCK'] || 0, itemNum: item['ITEM'] || 'N/A',
+                            segmento: item['SEGMENTO'] || 'N/A', categoria: item['CATEGORIA'] || 'N/A',
+                            subcategoria: item['SUB CATEGORIA'] || 'N/A', proveedor: item['PROVEEDOR'] || 'N/A',
+                            caja: item['QTY X CAJA'] || '1', ajustado: item['AJUSTADO?'] || 'N',
+                            ultAjuste: formatExcelDate(item['ULT AJUSTE']), costo: item['COSTO'] || 0
+                        };
+                    });
+                    await saveToPersistence(storeData);
+                    showSearchUI();
+                } catch (err) { alert("Error al procesar."); uploadSection.classList.remove('hidden'); }
+                finally { loadingSpinner.classList.add('hidden'); }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function populateFilters() {
+            const depts = [...new Set(storeData.map(i => i.dept))].sort();
+            const marcas = [...new Set(storeData.map(i => i.marca))].sort();
+            const statusList = [...new Set(storeData.map(i => i.status))].sort();
+            const categorias = [...new Set(storeData.map(i => i.categoria))].sort();
+            deptFilter.innerHTML = '<option value="">Todos los Deptos</option>';
+            marcaFilter.innerHTML = '<option value="">Todas las Marcas</option>';
+            statusFilter.innerHTML = '<option value="">Cualquier Status</option>';
+            categoriaFilter.innerHTML = '<option value="">Todas las Categorías</option>';
+            depts.forEach(d => { if(d) { let opt = document.createElement('option'); opt.value = d; opt.innerText = d; deptFilter.appendChild(opt); } });
+            marcas.forEach(m => { if(m) { let opt = document.createElement('option'); opt.value = m; opt.innerText = m; marcaFilter.appendChild(opt); } });
+            statusList.forEach(s => { if(s) { let opt = document.createElement('option'); opt.value = s; opt.innerText = s; statusFilter.appendChild(opt); } });
+            categorias.forEach(c => { if(c) { let opt = document.createElement('option'); opt.value = c; opt.innerText = c; categoriaFilter.appendChild(opt); } });
+        }
+
+        function applyFilters(searchTerm = null) {
+            const query = searchTerm !== null ? searchTerm.toLowerCase() : searchInput.value.toLowerCase();
+            const dept = deptFilter.value;
+            const marca = marcaFilter.value;
+            const status = statusFilter.value;
+            const categoria = categoriaFilter.value;
+            filteredData = storeData.filter(item => {
+                const matchesQuery = !query || String(item.sku).toLowerCase().includes(query) || String(item.itemNum).toLowerCase().includes(query) || String(item.description).toLowerCase().includes(query) || String(item.marca).toLowerCase().includes(query);
+                const matchesDept = !dept || String(item.dept) === String(dept);
+                const matchesMarca = !marca || String(item.marca) === String(marca);
+                const matchesStatus = !status || String(item.status) === String(status);
+                const matchesCategoria = !categoria || String(item.categoria) === String(categoria);
+                return matchesQuery && matchesDept && matchesMarca && matchesStatus && matchesCategoria;
+            });
+            currentPage = 1;
+            resultsCount.innerText = `Encontrados: ${filteredData.length}`;
+            renderResults();
+        }
+
+        function renderMateriales() {
+            const data = storeData.filter(item => String(item.dept) === '99');
+            renderGenericResults(materialesList, data, false, true);
+        }
+
+        function processConteoList() {
+            const text = conteoInputList.value.trim();
+            if (!text) return alert("Pega una lista primero.");
+            const lines = text.split(/\n|,/).map(l => l.trim()).filter(l => l);
+            conteoFilteredData = storeData.filter(item => lines.includes(String(item.sku)) || lines.includes(String(item.itemNum)));
+            btnConteoPdf.classList.toggle('hidden', conteoFilteredData.length === 0);
+            renderGenericResults(conteoResultsList, conteoFilteredData, false, false);
+        }
+
+        function renderResults(append = false) {
+            renderGenericResults(resultsList, filteredData, append, false);
+        }
+
+        async function renderGenericResults(container, data, append = false, isMateriales = false) {
+            if (!append) { container.innerHTML = ''; expandedItemId = null; }
+            const start = append ? container.children.length : 0;
+            const pageData = isMateriales ? data : data.slice(start, start + rowsPerPage);
+            
+            if (pageData.length === 0 && !append) { container.innerHTML = '<div class="no-results card">Sin resultados.</div>'; return; }
+            
+            const fragment = document.createDocumentFragment();
+            for (const item of pageData) {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                const isAdj = String(item.ajustado).toUpperCase().startsWith('S');
+                card.innerHTML = `
+                    <div class="card-main">
+                        <div class="result-sku">#${item.sku}</div>
+                        <div class="result-info">
+                            <h3>${item.description}</h3>
+                            <div class="result-tags">
+                                <span class="tag tag-dept">Depto ${item.dept}</span>
+                                <span class="tag tag-pps">${item.marca}</span>
+                                <span class="tag" style="background:${item.stock<=0?'#FFEBEE':'#E8F5E9'};color:${item.stock<=0?'#D32F2F':'#2E7D32'}">Stock: ${item.stock}</span>
+                                ${isMateriales ? `<button class="purchase-log-btn" onclick="event.stopPropagation(); promptPurchase('${item.sku}')">+ Compra</button>` : `<span class="tag ${isAdj?'tag-adj':'tag-no-adj'}">${isAdj?'✅':'❌'} Ajustado</span>`}
+                                <span class="tag tag-status">Status: ${item.status}</span>
+                            </div>
+                        </div>
+                        <div class="result-price">$${Number(item.price).toLocaleString('es-CL')}</div>
+                    </div>
+                    <div id="detail-${container.id}-${item.id}" class="card-detail">
+                        <div class="info-grid">
+                            <div class="info-item"><strong>Segmento</strong><span>${item.segmento}</span></div>
+                            <div class="info-item"><strong>Categoría</strong><span>${item.categoria}</span></div>
+                            <div class="info-item"><strong>Proveedor</strong><span>${item.proveedor}</span></div>
+                            <div class="info-item"><strong>Costo</strong><span>$${Number(item.costo).toLocaleString('es-CL')}</span></div>
+                            <div class="info-item"><strong>Último Ajuste</strong><span>${item.ultAjuste}</span></div>
+                        </div>
+                        <div id="history-${container.id}-${item.sku}" class="purchase-history hidden"></div>
+                        <div class="barcode-container"><svg id="barcode-${container.id}-${item.id}"></svg></div>
+                    </div>
+                    <div class="item-footer"><span>ID: ${item.sku}</span><span class="item-number">ITEM: ${item.itemNum}</span></div>
+                `;
+                card.onclick = () => toggleExpandGeneric(item, container.id);
+                fragment.appendChild(card);
+            }
+            container.appendChild(fragment);
+        }
+
+        async function promptPurchase(sku) {
+            const qty = prompt("Cantidad comprada:");
+            if (qty && !isNaN(qty)) {
+                await savePurchase(sku, qty);
+                alert("Compra registrada.");
+                renderMateriales(); // Refresh to show logs if expanded
+            }
+        }
+
+        async function toggleExpandGeneric(item, containerId) {
+            const detail = document.getElementById(`detail-${containerId}-${item.id}`);
+            const isExpanded = detail.classList.contains('expanded');
+            
+            if (expandedItemId !== null && expandedItemId !== `${containerId}-${item.id}`) {
+                const prev = document.getElementById(`detail-${expandedItemId}`);
+                if(prev) prev.classList.remove('expanded');
+            }
+            
+            if (isExpanded) { detail.classList.remove('expanded'); expandedItemId = null; }
+            else {
+                detail.classList.add('expanded');
+                expandedItemId = `${containerId}-${item.id}`;
+                
+                // Render Barcode
+                if (item.sku !== 'N/A') { JsBarcode(`#barcode-${containerId}-${item.id}`, item.sku, { format: "CODE128", width: 2, height: 60, displayValue: false }); }
+                
+                // Render History
+                const historyDiv = document.getElementById(`history-${containerId}-${item.sku}`);
+                const history = await getPurchases(item.sku);
+                if (history.length > 0) {
+                    historyDiv.innerHTML = `<h4>Historial de Compras</h4><ul class="purchase-list">` + 
+                        history.map(h => `<li><span>${h.date}</span><strong>${h.qty} unid.</strong></li>`).join('') + `</ul>`;
+                    historyDiv.classList.remove('hidden');
+                } else {
+                    historyDiv.classList.add('hidden');
+                }
+            }
+        }
+
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        }
+
+        function resetFilters() { searchInput.value = ''; deptFilter.value = ''; marcaFilter.value = ''; statusFilter.value = ''; categoriaFilter.value = ''; applyFilters(); }
+        
+        async function generatePDF(customData = null, fileName = "Inventario") {
+            const dataToExport = customData || filteredData;
+            if (dataToExport.length === 0) { alert("No hay datos para exportar."); return; }
+            if (!confirm(`¿Generar PDF con ${dataToExport.length} items?`)) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+
+            // Header
+            doc.setFontSize(18);
+            doc.setTextColor(0, 113, 206); // Walmart Blue
+            doc.text("Reporte de Inventario / Conteo", pageWidth / 2, 15, { align: 'center' });
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Fecha: ${new Date().toLocaleString()} | Total Items: ${dataToExport.length}`, pageWidth / 2, 22, { align: 'center' });
+
+            const tableData = [];
+            const canvas = document.createElement('canvas');
+
+            for (const item of dataToExport) {
+                tableData.push({
+                    itemNum: item.itemNum,
+                    sku: item.sku,
+                    description: item.description,
+                    marca: item.marca,
+                    conteo: "[  ]"
+                });
+            }
+
+            doc.autoTable({
+                startY: 28,
+                head: [['ITEM', 'CÓDIGO DE BARRAS', 'DESCRIPCIÓN', 'MARCA', 'CONTEO']],
+                body: tableData,
+                columns: [
+                    { header: 'ITEM', dataKey: 'itemNum' },
+                    { header: 'CÓDIGO DE BARRAS', dataKey: 'sku' },
+                    { header: 'DESCRIPCIÓN', dataKey: 'description' },
+                    { header: 'MARCA', dataKey: 'marca' },
+                    { header: 'CONTEO', dataKey: 'conteo' }
+                ],
+                theme: 'striped',
+                headStyles: { fillColor: [0, 113, 206], textColor: 255 },
+                styles: { fontSize: 8, valign: 'middle', cellPadding: 2, minCellHeight: 18 },
+                columnStyles: {
+                    0: { cellWidth: 15 },
+                    1: { cellWidth: 45, textColor: [255, 255, 255] },
+                    2: { cellWidth: 'auto' },
+                    3: { cellWidth: 25 },
+                    4: { cellWidth: 18, halign: 'center' }
+                },
+                didDrawCell: (data) => {
+                    if (data.section === 'body' && data.column.index === 1) {
+                        const sku = data.row.raw.sku;
+                        if (sku && sku !== 'N/A') {
+                            try {
+                                JsBarcode(canvas, sku, {
+                                    format: "CODE128", width: 2, height: 40, displayValue: false, margin: 0
+                                });
+                                const imgData = canvas.toDataURL('image/jpeg', 0.7);
+                                const imgWidth = 40;
+                                const imgHeight = 14; 
+                                const xOffset = data.cell.x + (data.cell.width - imgWidth) / 2;
+                                const yOffset = data.cell.y + (data.cell.height - imgHeight) / 2;
+                                doc.addImage(imgData, 'JPEG', xOffset, yOffset, imgWidth, imgHeight);
+                            } catch (e) { console.error(e); }
+                        }
+                    }
+                }
+            });
+
+            doc.save(`${fileName}_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
+
+        document.getElementById('download-pdf').onclick = generatePDF;
+
+        function openScanner() { scannerModal.classList.remove('hidden'); html5QrCode = new Html5Qrcode("reader"); html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => { searchInput.value = txt; applyFilters(txt); closeScannerModal(); }).catch(() => closeScannerModal()); }
+        function closeScannerModal() { if (html5QrCode) html5QrCode.stop().then(() => scannerModal.classList.add('hidden')).catch(() => scannerModal.classList.add('hidden')); else scannerModal.classList.add('hidden'); }
+        function debounce(func, wait) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); }; }
+        function formatExcelDate(v) { if(!v || v==='Sin fecha') return 'Sin fecha'; if(!isNaN(v)&&typeof v==='number'){ let d=new Date((v-25569)*86400*1000); return d.toLocaleDateString('es-CL'); } return v; }
+
+        init();
+    </script>
+</body>
+</html>
