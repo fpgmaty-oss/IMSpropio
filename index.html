@@ -5,15 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buscador de Maestra - Walmart Style</title>
-    
-    <!-- PWA Manifest & Meta Tags -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Maestra">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="theme-color" content="#0071CE">
-
     <!-- SheetJS for Excel Support -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <!-- HTML5-QRCode for Barcode Scanning -->
@@ -22,9 +13,6 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- jsPDF & AutoTable for PDF Generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
     
     <style>
         :root {
@@ -183,90 +171,6 @@
         .signature-footer { margin-top: 0.5rem; color: var(--walmart-blue); font-style: italic; }
         .hidden { display: none !important; }
 
-        /* Main Navigation */
-        .main-nav {
-            background: white;
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--walmart-border);
-            position: sticky;
-            top: 0;
-            z-index: 101;
-            box-shadow: 0 2px 4px var(--walmart-shadow);
-        }
-        .nav-btn {
-            background: none;
-            border: none;
-            padding: 0.6rem 1.25rem;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-        }
-        .nav-btn.active {
-            color: var(--walmart-blue);
-            border-bottom-color: var(--walmart-blue);
-        }
-        .nav-btn:hover {
-            background: rgba(0, 113, 206, 0.05);
-        }
-
-        /* Materiales styles */
-        .purchase-log-btn {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-        .purchase-history {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: #f1f8ff;
-            border-radius: 8px;
-            font-size: 0.85rem;
-        }
-        .purchase-history h4 {
-            color: var(--walmart-blue);
-            margin-bottom: 0.5rem;
-        }
-        .purchase-list {
-            list-style: none;
-        }
-        .purchase-list li {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 4px 0;
-        }
-
-        /* Conteo Semanal styles */
-        .conteo-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        .conteo-input-area textarea {
-            width: 100%;
-            height: 150px;
-            padding: 1rem;
-            border: 1px solid var(--walmart-border);
-            border-radius: 8px;
-            font-family: monospace;
-            resize: vertical;
-        }
-        .conteo-actions {
-            display: flex;
-            gap: 1rem;
-        }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse-animation { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
         .pulse-animation { animation: pulse-animation 2s infinite ease-in-out; }
@@ -276,8 +180,6 @@
             .user-signature { display: none; }
             .card-main { grid-template-columns: 1fr; text-align: center; gap: 1rem; }
             .result-tags { justify-content: center; }
-            .main-nav { overflow-x: auto; justify-content: flex-start; }
-            .nav-btn { white-space: nowrap; padding: 0.6rem 0.8rem; }
         }
     </style>
 </head>
@@ -300,12 +202,6 @@
             </div>
         </div>
     </header>
-
-    <nav class="main-nav hidden" id="main-nav">
-        <button class="nav-btn active" data-nav="search">🔍 Buscador</button>
-        <button class="nav-btn" data-nav="materiales">🛠️ Materiales Local</button>
-        <button class="nav-btn" data-nav="conteo">📋 Conteo Semanal</button>
-    </nav>
 
     <main class="container">
         <!-- Initial Upload State -->
@@ -340,10 +236,6 @@
                     <select id="status-filter" class="form-select">
                         <option value="">Cualquier Status</option>
                     </select>
-                    <select id="categoria-filter" class="form-select">
-                        <option value="">Todas las Categorías</option>
-                    </select>
-                    <button id="download-pdf" class="btn btn-secondary" title="Exportar PDF con Código de Barras">📄 PDF</button>
                     <button id="reset-filters" class="btn btn-text">Limpiar</button>
                 </div>
             </div>
@@ -360,33 +252,6 @@
                 <p>Procesando datos...</p>
             </div>
         </section>
-
-        <!-- Materiales Sala Section -->
-        <section id="materiales-section" class="hidden">
-            <div class="card shadow-sm" style="margin-bottom: 2rem;">
-                <h2>🛠️ Gestión de Materiales Sala</h2>
-                <p>Items filtrados automáticamente por Departamento 99.</p>
-            </div>
-            <div id="materiales-list" class="results-grid"></div>
-        </section>
-
-        <!-- Conteo Semanal Section -->
-        <section id="conteo-section" class="hidden">
-            <div class="card shadow-sm conteo-container">
-                <h2>📋 Conteo Semanal de Items</h2>
-                <div class="conteo-input-area">
-                    <p>Pega aquí la lista de SKUs o ITEMS (uno por línea):</p>
-                    <textarea id="conteo-input-list" placeholder="Ej:&#10;780123456789&#10;123456&#10;..."></textarea>
-                </div>
-                <div class="conteo-actions">
-                    <button id="btn-process-conteo" class="btn btn-primary">Filtrar Lista</button>
-                    <button id="btn-conteo-pdf" class="btn btn-secondary hidden">📄 Exportar PDF Conteo</button>
-                </div>
-            </div>
-            <div id="conteo-results-list" class="results-grid" style="margin-top: 2rem;"></div>
-        </section>
-
-        <!-- Scanner Modal -->
 
         <!-- Scanner Modal -->
         <div id="scanner-modal" class="modal hidden">
@@ -450,8 +315,7 @@
         // IndexedDB Configuration
         const DB_NAME = 'WalmartMaestraDB';
         const STORE_NAME = 'maestra_data';
-        const PURCHASE_STORE = 'purchases';
-        const DB_VERSION = 2;
+        const DB_VERSION = 1;
 
         // Elements
         const dropZone = document.getElementById('drop-zone');
@@ -463,7 +327,6 @@
         const deptFilter = document.getElementById('dept-filter');
         const marcaFilter = document.getElementById('marca-filter');
         const statusFilter = document.getElementById('status-filter');
-        const categoriaFilter = document.getElementById('categoria-filter');
         const resultsCount = document.getElementById('results-count');
         const totalRowsSpan = document.getElementById('total-rows');
         const loadingSpinner = document.getElementById('loading-spinner');
@@ -476,35 +339,10 @@
         const helpModal = document.getElementById('help-modal');
         const closeHelp = document.getElementById('close-help');
         const tabBtns = document.querySelectorAll('.tab-btn');
-        const mainNav = document.getElementById('main-nav');
-        const mainNavBtns = document.querySelectorAll('[data-nav]');
-        const sections = {
-            search: document.getElementById('search-section'),
-            materiales: document.getElementById('materiales-section'),
-            conteo: document.getElementById('conteo-section')
-        };
-        const materialesList = document.getElementById('materiales-list');
-        const conteoInputList = document.getElementById('conteo-input-list');
-        const btnProcessConteo = document.getElementById('btn-process-conteo');
-        const btnConteoPdf = document.getElementById('btn-conteo-pdf');
-        const conteoResultsList = document.getElementById('conteo-results-list');
-        
-        let conteoFilteredData = [];
 
         function init() {
             setupEventListeners();
             loadFromPersistence();
-            registerServiceWorker();
-        }
-
-        function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./sw.js')
-                        .then((reg) => console.log('Service Worker registrado.', reg.scope))
-                        .catch((err) => console.error('Error al registrar Service Worker.', err));
-                });
-            }
         }
 
         function setupEventListeners() {
@@ -518,7 +356,6 @@
             deptFilter.onchange = () => applyFilters();
             marcaFilter.onchange = () => applyFilters();
             statusFilter.onchange = () => applyFilters();
-            categoriaFilter.onchange = () => applyFilters();
             document.getElementById('reset-filters').onclick = resetFilters;
 
             scanBtn.onclick = openScanner;
@@ -528,14 +365,9 @@
             helpBtn.onclick = () => helpModal.classList.remove('hidden');
             closeHelp.onclick = () => helpModal.classList.add('hidden');
             tabBtns.forEach(btn => { btn.onclick = () => switchTab(btn.dataset.tab); });
-            mainNavBtns.forEach(btn => { btn.onclick = () => switchMainTab(btn.dataset.nav); });
             
-            btnProcessConteo.onclick = processConteoList;
-            btnConteoPdf.onclick = () => generatePDF(conteoFilteredData, "Conteo_Semanal");
-
             window.onscroll = () => {
-                const activeSection = Object.keys(sections).find(k => !sections[k].classList.contains('hidden'));
-                if (activeSection === 'search' && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
                     if (filteredData.length > currentPage * rowsPerPage) {
                         currentPage++;
                         renderResults(true);
@@ -551,7 +383,6 @@
                 request.onupgradeneeded = (e) => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
-                    if (!db.objectStoreNames.contains(PURCHASE_STORE)) db.createObjectStore(PURCHASE_STORE);
                 };
                 request.onsuccess = (e) => resolve(e.target.result);
                 request.onerror = (e) => reject(e.target.error);
@@ -581,64 +412,8 @@
                     storeData = data;
                     updatePersistenceUI(time);
                     showSearchUI();
-                } else {
-                    await loadDefaultMaestra();
                 }
             } catch (err) { console.error(err); }
-        }
-
-        async function loadDefaultMaestra() {
-            const statusText = document.querySelector('#drop-zone p');
-            const originalText = statusText ? statusText.innerText : 'Arrastra tu archivo Excel aquí o haz clic para subir';
-            try {
-                if (statusText) statusText.innerText = "Buscando Maestra predeterminada en el servidor...";
-                
-                let response = await fetch('Maestra.xlsx');
-                if (!response.ok) {
-                    // Fallback a minúscula si falla Maestra.xlsx con mayúscula
-                    response = await fetch('maestra.xlsx');
-                }
-                
-                if (!response.ok) {
-                    if (statusText) statusText.innerText = originalText;
-                    return; // Si no existe en el servidor, permitimos carga manual silenciosamente
-                }
-                
-                if (statusText) statusText.innerText = "Descargando Maestra del servidor...";
-                loadingSpinner.classList.remove('hidden');
-                uploadSection.classList.add('hidden');
-                
-                const buffer = await response.arrayBuffer();
-                const data = new Uint8Array(buffer);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                
-                storeData = jsonData.map((item, index) => {
-                    const getCleanSku = () => {
-                        const fields = [item['BARCODE'], item['UPC MAESTRA'], item['ITEM']];
-                        for (let f of fields) if (f && !String(f).startsWith('http')) return f;
-                        return item['ITEM'] || 'N/A';
-                    };
-                    return {
-                        id: index, sku: getCleanSku(), description: item['DESCRIPCIÓN'] || 'Sin Descripción',
-                        price: item['RETAIL'] || 0, dept: item['N° DPTO'] || 'Gral', marca: item['MARCA'] || 'N/A',
-                        status: item['STATUS'] || 'N/A', stock: item['STOCK'] || 0, itemNum: item['ITEM'] || 'N/A',
-                        segmento: item['SEGMENTO'] || 'N/A', categoria: item['CATEGORIA'] || 'N/A',
-                        subcategoria: item['SUB CATEGORIA'] || 'N/A', proveedor: item['PROVEEDOR'] || 'N/A',
-                        caja: item['QTY X CAJA'] || '1', ajustado: item['AJUSTADO?'] || 'N',
-                        ultAjuste: formatExcelDate(item['ULT AJUSTE']), costo: item['COSTO'] || 0
-                    };
-                });
-                
-                await saveToPersistence(storeData);
-                showSearchUI();
-            } catch (err) {
-                console.error("Error al cargar la maestra predeterminada:", err);
-                if (statusText) statusText.innerText = originalText;
-                uploadSection.classList.remove('hidden');
-            } finally {
-                loadingSpinner.classList.add('hidden');
-            }
         }
 
         async function clearPersistence() {
@@ -656,38 +431,12 @@
             else { lastLoadStatus.innerText = `Sin datos`; clearDataBtn.classList.add('hidden'); }
         }
 
-        // New Purchase Logging Functions
-        async function savePurchase(sku, qty) {
-            const db = await openDB();
-            const tx = db.transaction(PURCHASE_STORE, 'readwrite');
-            const store = tx.objectStore(PURCHASE_STORE);
-            const purchases = await getRequest(store.get(sku)) || [];
-            purchases.push({ qty, date: new Date().toLocaleString() });
-            await store.put(purchases, sku);
-        }
-
-        async function getPurchases(sku) {
-            const db = await openDB();
-            const tx = db.transaction(PURCHASE_STORE, 'readonly');
-            const store = tx.objectStore(PURCHASE_STORE);
-            return await getRequest(store.get(sku)) || [];
-        }
-
         function showSearchUI() {
             uploadSection.classList.add('hidden');
-            mainNav.classList.remove('hidden');
-            switchMainTab('search');
+            searchSection.classList.remove('hidden');
             populateFilters();
             totalRowsSpan.innerText = `Total: ${storeData.length}`;
             applyFilters();
-        }
-
-        function switchMainTab(target) {
-            Object.values(sections).forEach(s => s.classList.add('hidden'));
-            mainNavBtns.forEach(b => b.classList.toggle('active', b.dataset.nav === target));
-            sections[target].classList.remove('hidden');
-            
-            if (target === 'materiales') renderMateriales();
         }
 
         async function handleFile(file) {
@@ -728,15 +477,12 @@
             const depts = [...new Set(storeData.map(i => i.dept))].sort();
             const marcas = [...new Set(storeData.map(i => i.marca))].sort();
             const statusList = [...new Set(storeData.map(i => i.status))].sort();
-            const categorias = [...new Set(storeData.map(i => i.categoria))].sort();
             deptFilter.innerHTML = '<option value="">Todos los Deptos</option>';
             marcaFilter.innerHTML = '<option value="">Todas las Marcas</option>';
             statusFilter.innerHTML = '<option value="">Cualquier Status</option>';
-            categoriaFilter.innerHTML = '<option value="">Todas las Categorías</option>';
             depts.forEach(d => { if(d) { let opt = document.createElement('option'); opt.value = d; opt.innerText = d; deptFilter.appendChild(opt); } });
             marcas.forEach(m => { if(m) { let opt = document.createElement('option'); opt.value = m; opt.innerText = m; marcaFilter.appendChild(opt); } });
             statusList.forEach(s => { if(s) { let opt = document.createElement('option'); opt.value = s; opt.innerText = s; statusFilter.appendChild(opt); } });
-            categorias.forEach(c => { if(c) { let opt = document.createElement('option'); opt.value = c; opt.innerText = c; categoriaFilter.appendChild(opt); } });
         }
 
         function applyFilters(searchTerm = null) {
@@ -744,47 +490,25 @@
             const dept = deptFilter.value;
             const marca = marcaFilter.value;
             const status = statusFilter.value;
-            const categoria = categoriaFilter.value;
             filteredData = storeData.filter(item => {
                 const matchesQuery = !query || String(item.sku).toLowerCase().includes(query) || String(item.itemNum).toLowerCase().includes(query) || String(item.description).toLowerCase().includes(query) || String(item.marca).toLowerCase().includes(query);
                 const matchesDept = !dept || String(item.dept) === String(dept);
                 const matchesMarca = !marca || String(item.marca) === String(marca);
                 const matchesStatus = !status || String(item.status) === String(status);
-                const matchesCategoria = !categoria || String(item.categoria) === String(categoria);
-                return matchesQuery && matchesDept && matchesMarca && matchesStatus && matchesCategoria;
+                return matchesQuery && matchesDept && matchesMarca && matchesStatus;
             });
             currentPage = 1;
             resultsCount.innerText = `Encontrados: ${filteredData.length}`;
             renderResults();
         }
 
-        function renderMateriales() {
-            const data = storeData.filter(item => String(item.dept) === '99');
-            renderGenericResults(materialesList, data, false, true);
-        }
-
-        function processConteoList() {
-            const text = conteoInputList.value.trim();
-            if (!text) return alert("Pega una lista primero.");
-            const lines = text.split(/\n|,/).map(l => l.trim()).filter(l => l);
-            conteoFilteredData = storeData.filter(item => lines.includes(String(item.sku)) || lines.includes(String(item.itemNum)));
-            btnConteoPdf.classList.toggle('hidden', conteoFilteredData.length === 0);
-            renderGenericResults(conteoResultsList, conteoFilteredData, false, false);
-        }
-
         function renderResults(append = false) {
-            renderGenericResults(resultsList, filteredData, append, false);
-        }
-
-        async function renderGenericResults(container, data, append = false, isMateriales = false) {
-            if (!append) { container.innerHTML = ''; expandedItemId = null; }
-            const start = append ? container.children.length : 0;
-            const pageData = isMateriales ? data : data.slice(start, start + rowsPerPage);
-            
-            if (pageData.length === 0 && !append) { container.innerHTML = '<div class="no-results card">Sin resultados.</div>'; return; }
-            
+            if (!append) { resultsList.innerHTML = ''; expandedItemId = null; }
+            const start = (currentPage - 1) * rowsPerPage;
+            const pageData = filteredData.slice(start, start + rowsPerPage);
+            if (pageData.length === 0 && !append) { resultsList.innerHTML = '<div class="no-results card">Sin resultados.</div>'; return; }
             const fragment = document.createDocumentFragment();
-            for (const item of pageData) {
+            pageData.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'result-card';
                 const isAdj = String(item.ajustado).toUpperCase().startsWith('S');
@@ -797,13 +521,13 @@
                                 <span class="tag tag-dept">Depto ${item.dept}</span>
                                 <span class="tag tag-pps">${item.marca}</span>
                                 <span class="tag" style="background:${item.stock<=0?'#FFEBEE':'#E8F5E9'};color:${item.stock<=0?'#D32F2F':'#2E7D32'}">Stock: ${item.stock}</span>
-                                ${isMateriales ? `<button class="purchase-log-btn" onclick="event.stopPropagation(); promptPurchase('${item.sku}')">+ Compra</button>` : `<span class="tag ${isAdj?'tag-adj':'tag-no-adj'}">${isAdj?'✅':'❌'} Ajustado</span>`}
+                                <span class="tag ${isAdj?'tag-adj':'tag-no-adj'}">${isAdj?'✅':'❌'} Ajustado</span>
                                 <span class="tag tag-status">Status: ${item.status}</span>
                             </div>
                         </div>
                         <div class="result-price">$${Number(item.price).toLocaleString('es-CL')}</div>
                     </div>
-                    <div id="detail-${container.id}-${item.id}" class="card-detail">
+                    <div id="detail-${item.id}" class="card-detail">
                         <div class="info-grid">
                             <div class="info-item"><strong>Segmento</strong><span>${item.segmento}</span></div>
                             <div class="info-item"><strong>Categoría</strong><span>${item.categoria}</span></div>
@@ -811,56 +535,31 @@
                             <div class="info-item"><strong>Costo</strong><span>$${Number(item.costo).toLocaleString('es-CL')}</span></div>
                             <div class="info-item"><strong>Último Ajuste</strong><span>${item.ultAjuste}</span></div>
                         </div>
-                        <div id="history-${container.id}-${item.sku}" class="purchase-history hidden"></div>
-                        <div class="barcode-container"><svg id="barcode-${container.id}-${item.id}"></svg></div>
+                        <div class="barcode-container"><svg id="barcode-${item.id}"></svg></div>
                     </div>
                     <div class="item-footer"><span>ID: ${item.sku}</span><span class="item-number">ITEM: ${item.itemNum}</span></div>
                 `;
-                card.onclick = () => toggleExpandGeneric(item, container.id);
+                card.onclick = () => toggleExpand(item.id);
                 fragment.appendChild(card);
-            }
-            container.appendChild(fragment);
+            });
+            resultsList.appendChild(fragment);
         }
 
-        async function promptPurchase(sku) {
-            const qty = prompt("Cantidad comprada:");
-            if (qty && !isNaN(qty)) {
-                await savePurchase(sku, qty);
-                alert("Compra registrada.");
-                renderMateriales(); // Refresh to show logs if expanded
-            }
-        }
-
-        async function toggleExpandGeneric(item, containerId) {
-            const detail = document.getElementById(`detail-${containerId}-${item.id}`);
+        function toggleExpand(id) {
+            const detail = document.getElementById(`detail-${id}`);
             const isExpanded = detail.classList.contains('expanded');
-            
-            if (expandedItemId !== null && expandedItemId !== `${containerId}-${item.id}`) {
+            if (expandedItemId !== null && expandedItemId !== id) {
                 const prev = document.getElementById(`detail-${expandedItemId}`);
                 if(prev) prev.classList.remove('expanded');
             }
-            
             if (isExpanded) { detail.classList.remove('expanded'); expandedItemId = null; }
             else {
                 detail.classList.add('expanded');
-                expandedItemId = `${containerId}-${item.id}`;
-                
-                // Render Barcode
-                if (item.sku !== 'N/A') { JsBarcode(`#barcode-${containerId}-${item.id}`, item.sku, { format: "CODE128", width: 2, height: 60, displayValue: false }); }
-                
-                // Render History
-                const historyDiv = document.getElementById(`history-${containerId}-${item.sku}`);
-                const history = await getPurchases(item.sku);
-                if (history.length > 0) {
-                    historyDiv.innerHTML = `<h4>Historial de Compras</h4><ul class="purchase-list">` + 
-                        history.map(h => `<li><span>${h.date}</span><strong>${h.qty} unid.</strong></li>`).join('') + `</ul>`;
-                    historyDiv.classList.remove('hidden');
-                } else {
-                    historyDiv.classList.add('hidden');
-                }
+                expandedItemId = id;
+                const item = storeData.find(i => i.id === id);
+                if (item && item.sku !== 'N/A') { JsBarcode(`#barcode-${id}`, item.sku, { format: "CODE128", width: 2, height: 60, displayValue: false }); }
             }
         }
-
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
@@ -869,85 +568,7 @@
             document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
         }
 
-        function resetFilters() { searchInput.value = ''; deptFilter.value = ''; marcaFilter.value = ''; statusFilter.value = ''; categoriaFilter.value = ''; applyFilters(); }
-        
-        async function generatePDF(customData = null, fileName = "Inventario") {
-            const dataToExport = customData || filteredData;
-            if (dataToExport.length === 0) { alert("No hay datos para exportar."); return; }
-            if (!confirm(`¿Generar PDF con ${dataToExport.length} items?`)) return;
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-            const pageWidth = doc.internal.pageSize.getWidth();
-
-            // Header
-            doc.setFontSize(18);
-            doc.setTextColor(0, 113, 206); // Walmart Blue
-            doc.text("Reporte de Inventario / Conteo", pageWidth / 2, 15, { align: 'center' });
-            
-            doc.setFontSize(10);
-            doc.setTextColor(100);
-            doc.text(`Fecha: ${new Date().toLocaleString()} | Total Items: ${dataToExport.length}`, pageWidth / 2, 22, { align: 'center' });
-
-            const tableData = [];
-            const canvas = document.createElement('canvas');
-
-            for (const item of dataToExport) {
-                tableData.push({
-                    itemNum: item.itemNum,
-                    sku: item.sku,
-                    description: item.description,
-                    marca: item.marca,
-                    conteo: "[  ]"
-                });
-            }
-
-            doc.autoTable({
-                startY: 28,
-                head: [['ITEM', 'CÓDIGO DE BARRAS', 'DESCRIPCIÓN', 'MARCA', 'CONTEO']],
-                body: tableData,
-                columns: [
-                    { header: 'ITEM', dataKey: 'itemNum' },
-                    { header: 'CÓDIGO DE BARRAS', dataKey: 'sku' },
-                    { header: 'DESCRIPCIÓN', dataKey: 'description' },
-                    { header: 'MARCA', dataKey: 'marca' },
-                    { header: 'CONTEO', dataKey: 'conteo' }
-                ],
-                theme: 'striped',
-                headStyles: { fillColor: [0, 113, 206], textColor: 255 },
-                styles: { fontSize: 8, valign: 'middle', cellPadding: 2, minCellHeight: 18 },
-                columnStyles: {
-                    0: { cellWidth: 15 },
-                    1: { cellWidth: 45, textColor: [255, 255, 255] },
-                    2: { cellWidth: 'auto' },
-                    3: { cellWidth: 25 },
-                    4: { cellWidth: 18, halign: 'center' }
-                },
-                didDrawCell: (data) => {
-                    if (data.section === 'body' && data.column.index === 1) {
-                        const sku = data.row.raw.sku;
-                        if (sku && sku !== 'N/A') {
-                            try {
-                                JsBarcode(canvas, sku, {
-                                    format: "CODE128", width: 2, height: 40, displayValue: false, margin: 0
-                                });
-                                const imgData = canvas.toDataURL('image/jpeg', 0.7);
-                                const imgWidth = 40;
-                                const imgHeight = 14; 
-                                const xOffset = data.cell.x + (data.cell.width - imgWidth) / 2;
-                                const yOffset = data.cell.y + (data.cell.height - imgHeight) / 2;
-                                doc.addImage(imgData, 'JPEG', xOffset, yOffset, imgWidth, imgHeight);
-                            } catch (e) { console.error(e); }
-                        }
-                    }
-                }
-            });
-
-            doc.save(`${fileName}_${new Date().toISOString().slice(0,10)}.pdf`);
-        }
-
-        document.getElementById('download-pdf').onclick = generatePDF;
-
+        function resetFilters() { searchInput.value = ''; deptFilter.value = ''; marcaFilter.value = ''; statusFilter.value = ''; applyFilters(); }
         function openScanner() { scannerModal.classList.remove('hidden'); html5QrCode = new Html5Qrcode("reader"); html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (txt) => { searchInput.value = txt; applyFilters(txt); closeScannerModal(); }).catch(() => closeScannerModal()); }
         function closeScannerModal() { if (html5QrCode) html5QrCode.stop().then(() => scannerModal.classList.add('hidden')).catch(() => scannerModal.classList.add('hidden')); else scannerModal.classList.add('hidden'); }
         function debounce(func, wait) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); }; }
