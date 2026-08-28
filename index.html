@@ -1913,6 +1913,7 @@
                     storeData = data;
                     updatePersistenceUI(time);
                     showSearchUI();
+                    refreshMaestraInBackground(); // sin await: chequea GitHub de fondo sin trabar el arranque
                 } else {
                     await loadDefaultMaestra();
                 }
@@ -1948,24 +1949,36 @@
             'MAESTRA/Maestra.xlsx', 'MAESTRA/maestra.xlsx'
         ];
 
-        // Carga la Maestra publicada en GitHub/servidor.
-        // force=true fuerza la descarga (botón "Recargar") saltando caché con un query param.
+        // Descarga y parsea la Maestra desde GitHub/servidor. No toca la UI: solo devuelve
+        // el array ya mapeado, o null si no la encontró en ninguna ruta candidata.
+        async function fetchMaestraFromServer(force = false) {
+            const cacheBuster = force ? `?v=${Date.now()}` : '';
+            let response = null;
+            for (const path of MAESTRA_CANDIDATE_PATHS) {
+                try {
+                    const candidate = await fetch(path + cacheBuster);
+                    if (candidate.ok) { response = candidate; break; }
+                } catch (e) { /* probar siguiente ruta */ }
+            }
+            if (!response) return null;
+
+            const buffer = await response.arrayBuffer();
+            const data = new Uint8Array(buffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+            return jsonData.map(mapMaestraRow);
+        }
+
+        // Carga inicial (sin datos guardados aún) o recarga manual desde el botón "Recargar".
+        // Sí toca la UI: spinner, mensajes y pantalla de resultados.
         async function loadDefaultMaestra(force = false) {
             const statusText = document.querySelector('#drop-zone p');
             const originalText = statusText ? statusText.innerText : 'Arrastra tu archivo Excel aquí o haz clic para subir';
             try {
                 if (statusText) statusText.innerText = "Buscando Maestra predeterminada en el servidor...";
 
-                const cacheBuster = force ? `?v=${Date.now()}` : '';
-                let response = null;
-                for (const path of MAESTRA_CANDIDATE_PATHS) {
-                    try {
-                        const candidate = await fetch(path + cacheBuster);
-                        if (candidate.ok) { response = candidate; break; }
-                    } catch (e) { /* probar siguiente ruta */ }
-                }
-
-                if (!response) {
+                const freshData = await fetchMaestraFromServer(force);
+                if (!freshData) {
                     if (statusText) statusText.innerText = originalText;
                     return false; // Si no existe en el servidor, permitimos carga manual silenciosamente
                 }
@@ -1974,13 +1987,7 @@
                 loadingSpinner.classList.remove('hidden');
                 uploadSection.classList.add('hidden');
 
-                const buffer = await response.arrayBuffer();
-                const data = new Uint8Array(buffer);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-
-                storeData = jsonData.map(mapMaestraRow);
-
+                storeData = freshData;
                 await saveToPersistence(storeData);
                 showSearchUI();
                 return true;
@@ -1991,6 +1998,27 @@
                 return false;
             } finally {
                 loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // Revisa en silencio si hay una Maestra más nueva en GitHub cada vez que se abre la app,
+        // sin interrumpir al usuario (no cambia de pestaña ni tapa la pantalla con el spinner).
+        // Esto es lo que soluciona el "no me toma altiro el Excel": antes, si ya había datos
+        // guardados en el celular, la app nunca más volvía a mirar GitHub salvo que tocaras "Recargar".
+        async function refreshMaestraInBackground() {
+            try {
+                const freshData = await fetchMaestraFromServer(true);
+                if (!freshData || freshData.length === 0) return;
+                storeData = freshData;
+                await saveToPersistence(storeData);
+                if (!searchSection.classList.contains('hidden')) {
+                    populateFilters();
+                    totalRowsSpan.innerText = `Total: ${storeData.length}`;
+                    applyFilters();
+                }
+                updatePersistenceUI(new Date().toLocaleString());
+            } catch (err) {
+                console.error('No se pudo revisar actualizaciones de la Maestra en GitHub:', err);
             }
         }
 
