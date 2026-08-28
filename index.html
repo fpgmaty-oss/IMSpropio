@@ -898,6 +898,46 @@
             #reader {
                 width: 100% !important;
             }
+
+            /* Cabecera más compacta: menos padding desperdiciado en pantallas chicas */
+            .walmart-header {
+                padding: 0.9rem 1rem;
+            }
+
+            .logo-container {
+                gap: 0.6rem;
+            }
+
+            /* Ventas: KPIs y análisis en una sola columna prolija */
+            .kpi-container {
+                grid-template-columns: 1fr !important;
+            }
+
+            .analysis-section {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+
+            .product-sublist-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .product-sublist-metrics {
+                width: 100%;
+                justify-content: space-between;
+                border-top: 1px solid #F1F3F5;
+                padding-top: 4px;
+                margin-top: 2px;
+            }
+
+            /* Botones de acción de filtros a todo ancho, alineados con los selects */
+            #download-pdf,
+            #reset-filters,
+            #sales-reset-filters {
+                width: 100%;
+            }
         }
 
         /* Estilos del Calendario de Compras y Favoritos */
@@ -1014,6 +1054,153 @@
                 font-size: 0.7rem;
             }
         }
+
+        /* ============================================================
+           Ventas: estas clases se usaban en el JS pero nunca tenían
+           CSS real acá (solo existían en el style.css que no se carga).
+           Por eso la pestaña Ventas se veía "sin armonizar" vs el resto.
+           ============================================================ */
+        .trend-badge {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .trend-badge.trend-up {
+            background-color: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .trend-badge.trend-down {
+            background-color: #FFEBEE;
+            color: #D32F2F;
+        }
+
+        .trend-badge.trend-neutral {
+            background-color: #EEEEEE;
+            color: #757575;
+        }
+
+        .growth-bar-container {
+            width: 100%;
+            background-color: #E5E9EC;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+            position: relative;
+        }
+
+        .growth-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease-out;
+        }
+
+        .growth-bar.growth-positive {
+            background: linear-gradient(90deg, #81C784, #4CAF50);
+        }
+
+        .growth-bar.growth-negative {
+            background: linear-gradient(90deg, #E57373, #D32F2F);
+        }
+
+        .analysis-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #ECEFF1;
+            font-size: 0.85rem;
+        }
+
+        .analysis-item:last-child {
+            border-bottom: none;
+        }
+
+        .analysis-name {
+            font-weight: 600;
+            color: var(--walmart-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+
+        .product-sublist-container {
+            padding: 1rem 1.5rem 1.5rem;
+            background-color: #F8F9FA;
+            border-top: 1px dashed var(--walmart-border);
+        }
+
+        .product-sublist-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--walmart-blue);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+
+        .product-sublist {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .product-sublist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #FFFFFF;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #E5E9EC;
+            font-size: 0.85rem;
+        }
+
+        .product-sublist-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .product-sublist-info strong {
+            color: var(--walmart-text);
+            font-weight: 600;
+        }
+
+        .product-sublist-info span {
+            color: #757575;
+            font-size: 0.75rem;
+        }
+
+        .product-sublist-metrics {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Botón "Limpiar": existía en el HTML pero la clase nunca se definió */
+        .btn-text {
+            background: none;
+            color: var(--walmart-blue);
+            border: none;
+            padding: 0.6rem 1rem;
+            font-weight: 600;
+            border-radius: 20px;
+            transition: background-color var(--transition-speed);
+        }
+
+        .btn-text:hover {
+            background-color: rgba(0, 113, 206, 0.08);
+        }
     </style>
 </head>
 
@@ -1056,6 +1243,9 @@
             <div class="user-signature">
                 <div class="header-status">
                     <span id="last-load-status">Sin datos cargados</span>
+                    <button id="maestra-reload-btn" class="btn-clear"
+                        style="background: var(--walmart-blue); color: white;" title="Recargar Maestra desde GitHub">🔄
+                        Recargar</button>
                     <button id="clear-data-btn" class="btn-clear hidden" title="Borrar Maestra Guardada">🗑️
                         Borrar</button>
                     <button id="logout-btn" class="btn-clear"
@@ -1081,9 +1271,9 @@
             <span class="nav-icon">🛠️</span>
             <span class="nav-label">Materiales</span>
         </button>
-        <button class="nav-btn" data-nav="conteo">
+        <button class="nav-btn" data-nav="conteo" title="Conteo Semanal">
             <span class="nav-icon">📋</span>
-            <span class="nav-label">Conteo Semanal</span>
+            <span class="nav-label">Conteo</span>
         </button>
     </nav>
 
@@ -1486,6 +1676,7 @@
         const closeScanner = document.getElementById('close-scanner');
         const lastLoadStatus = document.getElementById('last-load-status');
         const clearDataBtn = document.getElementById('clear-data-btn');
+        const maestraReloadBtn = document.getElementById('maestra-reload-btn');
         const helpBtn = document.getElementById('help-btn');
         const helpModal = document.getElementById('help-modal');
         const closeHelp = document.getElementById('close-help');
@@ -1603,6 +1794,12 @@
             scanBtn.onclick = openScanner;
             closeScanner.onclick = closeScannerModal;
             clearDataBtn.onclick = clearPersistence;
+            maestraReloadBtn.onclick = async () => {
+                loadingSpinner.classList.remove('hidden');
+                const ok = await loadDefaultMaestra(true);
+                loadingSpinner.classList.add('hidden');
+                if (!ok) alert('No se pudo recargar desde el servidor. Verifica que Maestra.xlsx esté publicado en GitHub (en la raíz o en una carpeta MAESTRA/).');
+            };
 
             helpBtn.onclick = () => helpModal.classList.remove('hidden');
             closeHelp.onclick = () => helpModal.classList.add('hidden');
@@ -1725,21 +1922,52 @@
             } catch (err) { console.error(err); }
         }
 
-        async function loadDefaultMaestra() {
+        // Convierte una fila cruda del Excel de Maestra al objeto que usa la app.
+        // Compartida por la carga automática (GitHub) y la carga manual para no duplicar el mapeo.
+        function mapMaestraRow(item, index) {
+            const getCleanSku = () => {
+                const fields = [item['BARCODE'], item['UPC MAESTRA'], item['ITEM']];
+                for (let f of fields) if (f && !String(f).startsWith('http')) return f;
+                return item['ITEM'] || 'N/A';
+            };
+            return {
+                id: index, sku: getCleanSku(), description: item['DESCRIPCIÓN'] || 'Sin Descripción',
+                price: item['RETAIL'] || 0, dept: item['N° DPTO'] || 'Gral', marca: item['MARCA'] || 'N/A',
+                status: item['STATUS'] || 'N/A', stock: item['STOCK'] || 0, itemNum: item['ITEM'] || 'N/A',
+                segmento: item['SEGMENTO'] || 'N/A', categoria: item['CATEGORIA'] || 'N/A',
+                subcategoria: item['SUB CATEGORIA'] || 'N/A', proveedor: item['PROVEEDOR'] || 'N/A',
+                caja: item['QTY X CAJA'] || '1', ajustado: item['AJUSTADO?'] || 'N',
+                ultAjuste: formatExcelDate(item['ULT AJUSTE']), costo: item['COSTO'] || 0
+            };
+        }
+
+        // Rutas donde puede vivir el Excel de Maestra publicado en GitHub/servidor.
+        // Cubre tanto la raíz del repo como una carpeta MAESTRA/ dedicada.
+        const MAESTRA_CANDIDATE_PATHS = [
+            'Maestra.xlsx', 'maestra.xlsx',
+            'MAESTRA/Maestra.xlsx', 'MAESTRA/maestra.xlsx'
+        ];
+
+        // Carga la Maestra publicada en GitHub/servidor.
+        // force=true fuerza la descarga (botón "Recargar") saltando caché con un query param.
+        async function loadDefaultMaestra(force = false) {
             const statusText = document.querySelector('#drop-zone p');
             const originalText = statusText ? statusText.innerText : 'Arrastra tu archivo Excel aquí o haz clic para subir';
             try {
                 if (statusText) statusText.innerText = "Buscando Maestra predeterminada en el servidor...";
 
-                let response = await fetch('Maestra.xlsx');
-                if (!response.ok) {
-                    // Fallback a minúscula si falla Maestra.xlsx con mayúscula
-                    response = await fetch('maestra.xlsx');
+                const cacheBuster = force ? `?v=${Date.now()}` : '';
+                let response = null;
+                for (const path of MAESTRA_CANDIDATE_PATHS) {
+                    try {
+                        const candidate = await fetch(path + cacheBuster);
+                        if (candidate.ok) { response = candidate; break; }
+                    } catch (e) { /* probar siguiente ruta */ }
                 }
 
-                if (!response.ok) {
+                if (!response) {
                     if (statusText) statusText.innerText = originalText;
-                    return; // Si no existe en el servidor, permitimos carga manual silenciosamente
+                    return false; // Si no existe en el servidor, permitimos carga manual silenciosamente
                 }
 
                 if (statusText) statusText.innerText = "Descargando Maestra del servidor...";
@@ -1751,29 +1979,16 @@
                 const workbook = XLSX.read(data, { type: 'array' });
                 const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 
-                storeData = jsonData.map((item, index) => {
-                    const getCleanSku = () => {
-                        const fields = [item['BARCODE'], item['UPC MAESTRA'], item['ITEM']];
-                        for (let f of fields) if (f && !String(f).startsWith('http')) return f;
-                        return item['ITEM'] || 'N/A';
-                    };
-                    return {
-                        id: index, sku: getCleanSku(), description: item['DESCRIPCIÓN'] || 'Sin Descripción',
-                        price: item['RETAIL'] || 0, dept: item['N° DPTO'] || 'Gral', marca: item['MARCA'] || 'N/A',
-                        status: item['STATUS'] || 'N/A', stock: item['STOCK'] || 0, itemNum: item['ITEM'] || 'N/A',
-                        segmento: item['SEGMENTO'] || 'N/A', categoria: item['CATEGORIA'] || 'N/A',
-                        subcategoria: item['SUB CATEGORIA'] || 'N/A', proveedor: item['PROVEEDOR'] || 'N/A',
-                        caja: item['QTY X CAJA'] || '1', ajustado: item['AJUSTADO?'] || 'N',
-                        ultAjuste: formatExcelDate(item['ULT AJUSTE']), costo: item['COSTO'] || 0
-                    };
-                });
+                storeData = jsonData.map(mapMaestraRow);
 
                 await saveToPersistence(storeData);
                 showSearchUI();
+                return true;
             } catch (err) {
                 console.error("Error al cargar la maestra predeterminada:", err);
                 if (statusText) statusText.innerText = originalText;
                 uploadSection.classList.remove('hidden');
+                return false;
             } finally {
                 loadingSpinner.classList.add('hidden');
             }
@@ -1839,22 +2054,7 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    storeData = jsonData.map((item, index) => {
-                        const getCleanSku = () => {
-                            const fields = [item['BARCODE'], item['UPC MAESTRA'], item['ITEM']];
-                            for (let f of fields) if (f && !String(f).startsWith('http')) return f;
-                            return item['ITEM'] || 'N/A';
-                        };
-                        return {
-                            id: index, sku: getCleanSku(), description: item['DESCRIPCIÓN'] || 'Sin Descripción',
-                            price: item['RETAIL'] || 0, dept: item['N° DPTO'] || 'Gral', marca: item['MARCA'] || 'N/A',
-                            status: item['STATUS'] || 'N/A', stock: item['STOCK'] || 0, itemNum: item['ITEM'] || 'N/A',
-                            segmento: item['SEGMENTO'] || 'N/A', categoria: item['CATEGORIA'] || 'N/A',
-                            subcategoria: item['SUB CATEGORIA'] || 'N/A', proveedor: item['PROVEEDOR'] || 'N/A',
-                            caja: item['QTY X CAJA'] || '1', ajustado: item['AJUSTADO?'] || 'N',
-                            ultAjuste: formatExcelDate(item['ULT AJUSTE']), costo: item['COSTO'] || 0
-                        };
-                    });
+                    storeData = jsonData.map(mapMaestraRow);
                     await saveToPersistence(storeData);
                     showSearchUI();
                 } catch (err) { alert("Error al procesar."); uploadSection.classList.remove('hidden'); }
