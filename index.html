@@ -1942,12 +1942,20 @@
             };
         }
 
+        // Genera las rutas posibles donde puede vivir un archivo .xlsx publicado en GitHub Pages.
+        // GitHub Pages es sensible a mayúsculas/minúsculas (a diferencia de Windows), así que
+        // probamos el nombre tal cual, todo minúscula y todo mayúscula; en la raíz y en una
+        // carpeta dedicada (si se indica).
+        function buildXlsxCandidatePaths(baseName, folderName) {
+            const names = [...new Set([baseName, baseName.toLowerCase(), baseName.toUpperCase()])];
+            const files = names.map(n => `${n}.xlsx`);
+            const paths = [...files];
+            if (folderName) files.forEach(f => paths.push(`${folderName}/${f}`));
+            return paths;
+        }
+
         // Rutas donde puede vivir el Excel de Maestra publicado en GitHub/servidor.
-        // Cubre tanto la raíz del repo como una carpeta MAESTRA/ dedicada.
-        const MAESTRA_CANDIDATE_PATHS = [
-            'Maestra.xlsx', 'maestra.xlsx',
-            'MAESTRA/Maestra.xlsx', 'MAESTRA/maestra.xlsx'
-        ];
+        const MAESTRA_CANDIDATE_PATHS = buildXlsxCandidatePaths('Maestra', 'MAESTRA');
 
         // Descarga y parsea la Maestra desde GitHub/servidor. No toca la UI: solo devuelve
         // el array ya mapeado, o null si no la encontró en ninguna ruta candidata.
@@ -2925,11 +2933,18 @@
             } catch (err) { console.error('Error al cargar ventas persistidas:', err); }
         }
 
+        const VENTA_CANDIDATE_PATHS = buildXlsxCandidatePaths('Venta', 'VENTA');
+
         async function loadDefaultSales() {
             try {
-                let response = await fetch('Venta.xlsx');
-                if (!response.ok) response = await fetch('venta.xlsx');
-                if (!response.ok) return false;
+                let response = null;
+                for (const path of VENTA_CANDIDATE_PATHS) {
+                    try {
+                        const candidate = await fetch(path);
+                        if (candidate.ok) { response = candidate; break; }
+                    } catch (e) { /* probar siguiente ruta */ }
+                }
+                if (!response) return false;
                 
                 const buffer = await response.arrayBuffer();
                 const data = new Uint8Array(buffer);
