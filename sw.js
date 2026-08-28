@@ -1,4 +1,4 @@
-const CACHE_NAME = 'walmart-maestra-v3';
+const CACHE_NAME = 'walmart-maestra-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -45,9 +45,10 @@ self.addEventListener('fetch', (event) => {
   // Evitar interceptar solicitudes de esquemas que no sean HTTP o HTTPS (como chrome-extension)
   if (!event.request.url.startsWith('http')) return;
 
-  // No cachear archivos de datos para asegurar que siempre descargue la última versión del servidor
-  if (event.request.url.includes('Maestra.xlsx') || event.request.url.includes('maestra.xlsx') ||
-      event.request.url.includes('Venta.xlsx') || event.request.url.includes('venta.xlsx')) {
+  // No cachear archivos de datos (.xlsx) para asegurar que siempre descargue la
+  // ultima version del servidor. Comparacion en minuscula porque GitHub Pages es
+  // sensible a mayusculas y el nombre real puede venir como Maestra.xlsx, MAESTRA.xlsx, etc.
+  if (event.request.url.toLowerCase().includes('.xlsx')) {
     event.respondWith(fetch(event.request).catch(() => new Response('', { status: 503 })));
     return;
   }
