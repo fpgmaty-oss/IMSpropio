@@ -1201,6 +1201,70 @@
         .btn-text:hover {
             background-color: rgba(0, 113, 206, 0.08);
         }
+
+        /* Items Pesables - tarjetas de codigos de balanza */
+        .pesable-card {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--walmart-shadow);
+            border-left: 6px solid var(--walmart-yellow);
+            padding: 1rem 1.25rem;
+        }
+
+        .pesable-card-code {
+            flex: 0 0 auto;
+            background: var(--walmart-gray);
+            color: var(--walmart-accent);
+            font-weight: 700;
+            font-size: 1.15rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 84px;
+        }
+
+        .pesable-card-code small {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #757575;
+            text-transform: uppercase;
+        }
+
+        .pesable-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .pesable-card-info h4 {
+            font-size: 1rem;
+            color: var(--walmart-text);
+            margin-bottom: 0.4rem;
+        }
+
+        .pesable-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        @media (max-width: 600px) {
+            .pesable-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .pesable-card-info h4 {
+                margin-top: 0.25rem;
+            }
+
+            .pesable-tags {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -1268,8 +1332,12 @@
             <span class="nav-label">Ventas</span>
         </button>
         <button class="nav-btn" data-nav="materiales">
-            <span class="nav-icon">🛠️</span>
+            <span class="nav-icon">&#128736;&#65039;</span>
             <span class="nav-label">Materiales</span>
+        </button>
+        <button class="nav-btn" data-nav="pesables" title="Códigos de Balanza">
+            <span class="nav-icon">&#9878;&#65039;</span>
+            <span class="nav-label">Pesables</span>
         </button>
         <button class="nav-btn" data-nav="conteo" title="Conteo Semanal">
             <span class="nav-icon">📋</span>
@@ -1556,6 +1624,35 @@
             </div>
         </section>
 
+        <!-- Items Pesables / Codigos de Balanza Section -->
+        <section id="pesables-section" class="hidden">
+            <div class="card shadow-sm" style="margin-bottom: 1.5rem;">
+                <h2>&#9878;&#65039; Items Pesables - Codigos de Balanza</h2>
+                <p>Codigos oficiales de balanza para carnes y otros productos pesados en sala (incluye Cluster B: Brasil, Paraguay, Colombia).</p>
+            </div>
+
+            <div class="card shadow-sm" style="margin-bottom: 1.5rem; padding: 1rem;">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                    <div class="search-input-wrapper" style="flex: 1; min-width: 220px; border-radius: 20px; margin-bottom: 0;">
+                        <span class="search-icon">&#128269;</span>
+                        <input type="text" id="pesables-search-input" placeholder="Buscar por ITEM, corte/descripcion o codigo..." style="padding: 0.6rem 0;">
+                    </div>
+                    <select id="pesables-grupo-filter" class="form-select" style="flex: 0 1 240px;">
+                        <option value="">Todos los grupos</option>
+                        <option value="Cerdo / General">Cerdo / General</option>
+                        <option value="Vacuno - Cluster B">Vacuno - Cluster B</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="pesables-list" class="results-grid"></div>
+
+            <div class="card shadow-sm" style="margin-top: 1.5rem; font-size: 0.85rem; color: #757575;">
+                <p>&#128196; Pueden existir mas items con codigos de balanza por creacion de productos u otro motivo. Cualquier consulta por grupo de WSP PPS Acuenta o <strong>gonzalo.alvarez2@walmart.com</strong>.</p>
+                <p style="margin-top: 0.5rem;">* V MALAYA no registra ITEM ni codigo en Cluster B.</p>
+            </div>
+        </section>
+
         <!-- Conteo Semanal Section -->
         <section id="conteo-section" class="hidden">
             <div class="card shadow-sm conteo-container">
@@ -1687,6 +1784,7 @@
             search: document.getElementById('search-section'),
             ventas: document.getElementById('ventas-section'),
             materiales: document.getElementById('materiales-section'),
+            pesables: document.getElementById('pesables-section'),
             conteo: document.getElementById('conteo-section')
         };
         const salesUploadCard = document.getElementById('sales-upload-card');
@@ -1863,6 +1961,10 @@
             document.getElementById('calendar-event-modal').addEventListener('click', (e) => {
                 if (e.target === document.getElementById('calendar-event-modal')) closeCalendarModal();
             });
+
+            // Items Pesables / Codigos de Balanza
+            document.getElementById('pesables-search-input').oninput = debounce(() => renderPesables(), 300);
+            document.getElementById('pesables-grupo-filter').onchange = () => renderPesables();
 
             window.onscroll = () => {
                 const activeSection = Object.keys(sections).find(k => !sections[k].classList.contains('hidden'));
@@ -2078,6 +2180,7 @@
 
             if (target === 'materiales') renderMateriales();
             else if (target === 'ventas') renderSalesDashboard();
+            else if (target === 'pesables') renderPesables();
         }
 
         async function handleFile(file) {
@@ -2233,6 +2336,83 @@
             }
 
             renderGenericResults(materialesList, data, false, true);
+        }
+
+        // --- Items Pesables / Codigos de Balanza (datos fijos, no vienen de la Maestra) ---
+        // Fuente: cartillas "Tribu aCuenta - Codigos de Balanzas" compartidas por Sala.
+        const PESABLES_CERDO_GENERAL = [
+            { itemNbr: '5098604', desc: 'COSTILLAR CERDO UK', marca: 'PILGRIMS', size: '1KG', cod: '9149' },
+            { itemNbr: '448646', desc: 'COSTILLAR MEDIO', marca: 'CERDO SUPREMO', size: '1KG', cod: '15030' },
+            { itemNbr: '449759/5106340', desc: 'PUNTA COSTILLA AMERICANA', marca: 'EEUU', size: '1KG', cod: '15040' },
+            { itemNbr: '5101779', desc: 'COSTILLAR SUREÑO CON', marca: 'DARK PORK', size: '1KG', cod: '9152' },
+            { itemNbr: '5095517', desc: 'CHULETON PARRILLERO', marca: 'SUPER CERDO', size: '1KG', cod: '9164' }
+        ].map(item => ({ ...item, grupo: 'Cerdo / General' }));
+
+        const PESABLES_VACUNO_CLUSTER_B = [
+            { corte: 'V ABASTERO', item: '282301', cod: '9034' },
+            { corte: 'V ASADO CARNICERO', item: '282608', cod: '9514' },
+            { corte: 'V ASIENTO', item: '282188', cod: '9330' },
+            { corte: 'V CHOCLILLO', item: '282373', cod: '9680' },
+            { corte: 'V ENTRAÑA', item: '644471', cod: '10021' },
+            { corte: 'V FILETE', item: '282680', cod: '10169' },
+            { corte: 'V GANSO', item: '282746', cod: '10344' },
+            { corte: 'V HUACHALOMO', item: '282799', cod: '10647' },
+            { corte: 'V LOMO LISO', item: '282854', cod: '10935' },
+            { corte: 'V LOMO VETADO', item: '282922', cod: '11201' },
+            { corte: 'V MALAYA', item: '—', cod: '—' },
+            { corte: 'V PALANCA', item: '282991', cod: '11671' },
+            { corte: 'V PLATEADA', item: '283029', cod: '11821' },
+            { corte: 'V POLLO GANSO', item: '283049', cod: '12025' },
+            { corte: 'V POSTA NEGRA', item: '283070', cod: '12249' },
+            { corte: 'V POSTA PALETA', item: '283110', cod: '12573' },
+            { corte: 'V POSTA ROSADA', item: '283129', cod: '12791' },
+            { corte: 'V PUNTA GANSO', item: '283147', cod: '13046' },
+            { corte: 'V PUNTA PALETA', item: '283183', cod: '13197' },
+            { corte: 'V PUNTA PICAÑA', item: '283222', cod: '13383' },
+            { corte: 'V SOBRECOSTILLA', item: '283240', cod: '13583' },
+            { corte: 'V TAPABARRIGA', item: '541502', cod: '13785' },
+            { corte: 'V TAPAPECHO', item: '283291', cod: '13939' }
+        ].map(item => ({
+            itemNbr: item.item, desc: item.corte, marca: '', size: '',
+            cod: item.cod, grupo: 'Vacuno - Cluster B'
+        }));
+
+        const PESABLES_DATA = [...PESABLES_CERDO_GENERAL, ...PESABLES_VACUNO_CLUSTER_B];
+
+        function renderPesables() {
+            const query = document.getElementById('pesables-search-input').value.trim().toLowerCase();
+            const grupo = document.getElementById('pesables-grupo-filter').value;
+
+            let data = PESABLES_DATA;
+            if (grupo) data = data.filter(item => item.grupo === grupo);
+            if (query) {
+                data = data.filter(item =>
+                    String(item.itemNbr).toLowerCase().includes(query) ||
+                    String(item.desc).toLowerCase().includes(query) ||
+                    String(item.cod).toLowerCase().includes(query) ||
+                    String(item.marca).toLowerCase().includes(query)
+                );
+            }
+
+            const container = document.getElementById('pesables-list');
+            if (data.length === 0) {
+                container.innerHTML = '<div class="no-results card">Sin resultados.</div>';
+                return;
+            }
+            container.innerHTML = data.map(item => `
+                <div class="pesable-card">
+                    <div class="pesable-card-code"><small>Cod. Balanza</small>${escapeHtml(item.cod)}</div>
+                    <div class="pesable-card-info">
+                        <h4>${escapeHtml(item.desc)}</h4>
+                        <div class="pesable-tags">
+                            <span class="tag tag-dept">ITEM ${escapeHtml(item.itemNbr)}</span>
+                            ${item.marca ? `<span class="tag tag-pps">${escapeHtml(item.marca)}</span>` : ''}
+                            ${item.size ? `<span class="tag">${escapeHtml(item.size)}</span>` : ''}
+                            <span class="tag" style="background:#F3E5F5;color:#8E24AA;">${escapeHtml(item.grupo)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         // --- Gestión de Sub-pestañas ---
