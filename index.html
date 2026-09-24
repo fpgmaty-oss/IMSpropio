@@ -1328,8 +1328,12 @@
             <span class="nav-label">Buscador</span>
         </button>
         <button class="nav-btn" data-nav="ventas">
-            <span class="nav-icon">📈</span>
+            <span class="nav-icon">&#128200;</span>
             <span class="nav-label">Ventas</span>
+        </button>
+        <button class="nav-btn" data-nav="septiembre" title="Análisis de Categorías Septiembre">
+            <span class="nav-icon">&#128202;</span>
+            <span class="nav-label">Categorías Sept</span>
         </button>
         <button class="nav-btn" data-nav="materiales">
             <span class="nav-icon">&#128736;&#65039;</span>
@@ -1669,6 +1673,67 @@
             <div id="conteo-results-list" class="results-grid" style="margin-top: 2rem;"></div>
         </section>
 
+        <!-- Septiembre Categorias Section -->
+        <section id="septiembre-section" class="hidden">
+            <div class="card shadow-sm" style="padding: 1.25rem; margin-bottom: 1.5rem; border-left: 5px solid var(--walmart-blue);">
+                <h2 style="margin-bottom: 0.25rem;">Ventas por Categoria - Septiembre 2026</h2>
+                <p style="font-size: 0.85rem; color: #666;" id="sept-subtitle"></p>
+                <p style="font-size: 0.8rem; background:#fff8e1;border:1px solid #ffc220;color:#7a5200;padding:0.5rem 0.75rem;border-radius:6px;margin-top:0.5rem;" id="sept-warn"></p>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem;">
+                <div class="card shadow-sm" style="border-left:5px solid var(--walmart-blue);padding:1.25rem;">
+                    <div style="font-size:0.75rem;text-transform:uppercase;color:#666;font-weight:700;">Venta MTD</div>
+                    <div id="sept-kpi-venta" style="font-size:1.6rem;font-weight:800;color:var(--walmart-blue);">$0</div>
+                    <div id="sept-kpi-venta-sub" style="font-size:0.75rem;color:#888;"></div>
+                </div>
+                <div class="card shadow-sm" style="border-left:5px solid #4CAF50;padding:1.25rem;">
+                    <div style="font-size:0.75rem;text-transform:uppercase;color:#666;font-weight:700;">Var vs LY</div>
+                    <div id="sept-kpi-var" style="font-size:1.6rem;font-weight:800;"></div>
+                    <div id="sept-kpi-var-sub" style="font-size:0.75rem;color:#888;"></div>
+                </div>
+                <div class="card shadow-sm" style="border-left:5px solid #E57373;padding:1.25rem;">
+                    <div style="font-size:0.75rem;text-transform:uppercase;color:#666;font-weight:700;">Categorias en Negativo</div>
+                    <div id="sept-kpi-neg" style="font-size:1.6rem;font-weight:800;color:#D32F2F;"></div>
+                    <div style="font-size:0.75rem;color:#888;" id="sept-kpi-neg-sub"></div>
+                </div>
+                <div class="card shadow-sm" style="border-left:5px solid #4CAF50;padding:1.25rem;">
+                    <div style="font-size:0.75rem;text-transform:uppercase;color:#666;font-weight:700;">Categorias en Positivo</div>
+                    <div id="sept-kpi-pos" style="font-size:1.6rem;font-weight:800;color:#2E7D32;"></div>
+                    <div style="font-size:0.75rem;color:#888;" id="sept-kpi-pos-sub"></div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:1.5rem;">
+                <div class="card shadow-sm" style="padding:1.25rem;border-top:4px solid #4CAF50;">
+                    <h3 style="color:#2E7D32;font-size:1.1rem;margin-bottom:0.75rem;">Top 3 Positivos (mayor impulso $)</h3>
+                    <div id="sept-top-pos-list" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
+                </div>
+                <div class="card shadow-sm" style="padding:1.25rem;border-top:4px solid #E57373;">
+                    <h3 style="color:#C62828;font-size:1.1rem;margin-bottom:0.75rem;">Top 3 Negativos (mayor brecha $)</h3>
+                    <div id="sept-top-neg-list" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm" style="padding:1.25rem;">
+                <h2 style="margin-bottom:1rem;">Detalle Completo por Categoria</h2>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                        <thead>
+                            <tr style="background:#f8f9fa;">
+                                <th style="text-align:left;padding:8px 12px;">Categoria</th>
+                                <th style="text-align:right;padding:8px 12px;">Venta MTD</th>
+                                <th style="text-align:right;padding:8px 12px;">Venta LY</th>
+                                <th style="text-align:right;padding:8px 12px;">Var %</th>
+                                <th style="text-align:right;padding:8px 12px;">Impacto $</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sept-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- Scanner Modal -->
 
         <!-- Scanner Modal -->
@@ -1783,6 +1848,7 @@
         const sections = {
             search: document.getElementById('search-section'),
             ventas: document.getElementById('ventas-section'),
+            septiembre: document.getElementById('septiembre-section'),
             materiales: document.getElementById('materiales-section'),
             pesables: document.getElementById('pesables-section'),
             conteo: document.getElementById('conteo-section')
@@ -2180,6 +2246,7 @@
 
             if (target === 'materiales') renderMateriales();
             else if (target === 'ventas') renderSalesDashboard();
+            else if (target === 'septiembre') renderSeptiembreCategorias();
             else if (target === 'pesables') renderPesables();
         }
 
@@ -3256,6 +3323,493 @@
             }
             
             applySalesFilters();
+        }
+
+
+        // ---- Analisis de Categorias Septiembre 2026 (San Javier #155) ----
+        // Datos horneados desde el reporte fuente (snapshot MTD). Para actualizar
+        // a un nuevo mes/corte, correr build_septiembre_tab.py de nuevo con el
+        // nuevo export.
+        const SEPTIEMBRE_DATA = {
+    "meta": {
+        "local": "155 - San Javier (Cienfuegos)",
+        "corte": "01/09/2026 al 20/09/2026 (MTD - 20 dias)",
+        "fuente": "data (39).xlsx (export Power BI, Local 155 - San Javier)",
+        "ventaMtdM": 678.1,
+        "ventaLyM": 662.7,
+        "varPct": 2.3,
+        "gapM": 15.42,
+        "catNegativas": 19,
+        "catPositivas": 28,
+        "totalCategorias": 47
+    },
+    "topPositivas": [
+        {
+            "categoria": "ALIMENTOS CONGELADOS",
+            "ventaM": 18.58,
+            "lyM": 13.42,
+            "varPct": 38.5,
+            "impactoM": 5.16
+        },
+        {
+            "categoria": "CUIDADO E HIGIENE CORPORAL",
+            "ventaM": 26.03,
+            "lyM": 21.53,
+            "varPct": 20.9,
+            "impactoM": 4.5
+        },
+        {
+            "categoria": "ALMUERZO DE CARNE",
+            "ventaM": 41.82,
+            "lyM": 39.38,
+            "varPct": 6.2,
+            "impactoM": 2.45
+        }
+    ],
+    "topNegativas": [
+        {
+            "categoria": "ABARROTES/ENTREGA DIRECTA",
+            "ventaM": 49.7,
+            "lyM": 54.4,
+            "varPct": -8.7,
+            "impactoM": -4.71
+        },
+        {
+            "categoria": "LICORES",
+            "ventaM": 30.2,
+            "lyM": 32.8,
+            "varPct": -7.9,
+            "impactoM": -2.59
+        },
+        {
+            "categoria": "SERVICE DELI",
+            "ventaM": 2.32,
+            "lyM": 4.03,
+            "varPct": -42.6,
+            "impactoM": -1.72
+        }
+    ],
+    "categorias": [
+        {
+            "categoria": "ABARROTES/ENTREGA DIRECTA",
+            "ventaM": 49.7,
+            "lyM": 54.4,
+            "varPct": -8.7,
+            "impactoM": -4.71
+        },
+        {
+            "categoria": "LICORES",
+            "ventaM": 30.2,
+            "lyM": 32.8,
+            "varPct": -7.9,
+            "impactoM": -2.59
+        },
+        {
+            "categoria": "SERVICE DELI",
+            "ventaM": 2.32,
+            "lyM": 4.03,
+            "varPct": -42.6,
+            "impactoM": -1.72
+        },
+        {
+            "categoria": "CARNE CRUDA/CONGELADA",
+            "ventaM": 65.54,
+            "lyM": 66.98,
+            "varPct": -2.1,
+            "impactoM": -1.44
+        },
+        {
+            "categoria": "VESTUARIO BEBE",
+            "ventaM": 1.03,
+            "lyM": 2.43,
+            "varPct": -57.6,
+            "impactoM": -1.4
+        },
+        {
+            "categoria": "CHECK-OUTS",
+            "ventaM": 6.0,
+            "lyM": 7.4,
+            "varPct": -19.0,
+            "impactoM": -1.4
+        },
+        {
+            "categoria": "ELECTRONICA",
+            "ventaM": 0.86,
+            "lyM": 1.87,
+            "varPct": -54.1,
+            "impactoM": -1.01
+        },
+        {
+            "categoria": "LIBRERIA/PAPELERIA",
+            "ventaM": 2.6,
+            "lyM": 3.41,
+            "varPct": -23.8,
+            "impactoM": -0.81
+        },
+        {
+            "categoria": "MUEBLES/DECORACION/MALETERIA",
+            "ventaM": 2.11,
+            "lyM": 2.78,
+            "varPct": -23.9,
+            "impactoM": -0.66
+        },
+        {
+            "categoria": "PINTURAS",
+            "ventaM": 0.07,
+            "lyM": 0.55,
+            "varPct": -87.8,
+            "impactoM": -0.48
+        },
+        {
+            "categoria": "ZAPATERIA",
+            "ventaM": 1.23,
+            "lyM": 1.66,
+            "varPct": -25.6,
+            "impactoM": -0.42
+        },
+        {
+            "categoria": "PANADERIA",
+            "ventaM": 7.76,
+            "lyM": 8.13,
+            "varPct": -4.6,
+            "impactoM": -0.37
+        },
+        {
+            "categoria": "COCINA Y BANO",
+            "ventaM": 3.43,
+            "lyM": 3.76,
+            "varPct": -8.8,
+            "impactoM": -0.33
+        },
+        {
+            "categoria": "CUIDADO Y SALUD",
+            "ventaM": 3.05,
+            "lyM": 3.32,
+            "varPct": -8.3,
+            "impactoM": -0.27
+        },
+        {
+            "categoria": "ARTICULOS DE TEMPORADA",
+            "ventaM": 1.8,
+            "lyM": 1.99,
+            "varPct": -9.6,
+            "impactoM": -0.19
+        },
+        {
+            "categoria": "SIN CLASIFICAR",
+            "ventaM": 0.11,
+            "lyM": 0.22,
+            "varPct": -49.2,
+            "impactoM": -0.11
+        },
+        {
+            "categoria": "CABALLEROS",
+            "ventaM": 1.6,
+            "lyM": 1.69,
+            "varPct": -4.9,
+            "impactoM": -0.08
+        },
+        {
+            "categoria": "JUGUETES",
+            "ventaM": 2.11,
+            "lyM": 2.14,
+            "varPct": -1.3,
+            "impactoM": -0.03
+        },
+        {
+            "categoria": "AUTOMOTRIZ",
+            "ventaM": 1.27,
+            "lyM": 1.29,
+            "varPct": -1.8,
+            "impactoM": -0.02
+        },
+        {
+            "categoria": "ROPA INTERIOR",
+            "ventaM": 0.82,
+            "lyM": 0.8,
+            "varPct": 1.9,
+            "impactoM": 0.01
+        },
+        {
+            "categoria": "PANADERIA/REPOSTERIA EMPACADA",
+            "ventaM": 9.11,
+            "lyM": 9.07,
+            "varPct": 0.4,
+            "impactoM": 0.04
+        },
+        {
+            "categoria": "ROPA DE CAMA",
+            "ventaM": 1.69,
+            "lyM": 1.62,
+            "varPct": 3.9,
+            "impactoM": 0.06
+        },
+        {
+            "categoria": "HOME DELIVERY NUEVO",
+            "ventaM": 0.1,
+            "lyM": 0.0,
+            "varPct": 100.0,
+            "impactoM": 0.1
+        },
+        {
+            "categoria": "PANTY MEDIAS NUEVO",
+            "ventaM": 0.11,
+            "lyM": 0.0,
+            "varPct": 100.0,
+            "impactoM": 0.11
+        },
+        {
+            "categoria": "MASCOTAS",
+            "ventaM": 11.05,
+            "lyM": 10.91,
+            "varPct": 1.3,
+            "impactoM": 0.14
+        },
+        {
+            "categoria": "DAMAS",
+            "ventaM": 1.91,
+            "lyM": 1.72,
+            "varPct": 11.3,
+            "impactoM": 0.19
+        },
+        {
+            "categoria": "HARDLINES BEBE",
+            "ventaM": 0.55,
+            "lyM": 0.29,
+            "varPct": 89.1,
+            "impactoM": 0.26
+        },
+        {
+            "categoria": "COSMETICOS",
+            "ventaM": 1.47,
+            "lyM": 1.18,
+            "varPct": 25.0,
+            "impactoM": 0.29
+        },
+        {
+            "categoria": "LINEA BLANCA HOGAR NUEVO",
+            "ventaM": 0.29,
+            "lyM": 0.0,
+            "varPct": 100.0,
+            "impactoM": 0.29
+        },
+        {
+            "categoria": "ELECTRODOMESTICOS",
+            "ventaM": 2.75,
+            "lyM": 2.37,
+            "varPct": 15.8,
+            "impactoM": 0.38
+        },
+        {
+            "categoria": "DEPORTES",
+            "ventaM": 0.87,
+            "lyM": 0.46,
+            "varPct": 87.6,
+            "impactoM": 0.4
+        },
+        {
+            "categoria": "CONFITERIA",
+            "ventaM": 8.79,
+            "lyM": 8.34,
+            "varPct": 5.4,
+            "impactoM": 0.45
+        },
+        {
+            "categoria": "DECORACION HOGAR",
+            "ventaM": 0.92,
+            "lyM": 0.42,
+            "varPct": 120.1,
+            "impactoM": 0.5
+        },
+        {
+            "categoria": "PESCADO/MARISCO FRESCO/CONGE",
+            "ventaM": 1.59,
+            "lyM": 1.06,
+            "varPct": 50.6,
+            "impactoM": 0.53
+        },
+        {
+            "categoria": "ARTICULOS HOGAR/ORGANIZACION",
+            "ventaM": 11.5,
+            "lyM": 10.91,
+            "varPct": 5.4,
+            "impactoM": 0.59
+        },
+        {
+            "categoria": "CALCETINES",
+            "ventaM": 1.35,
+            "lyM": 0.66,
+            "varPct": 104.1,
+            "impactoM": 0.69
+        },
+        {
+            "categoria": "QUIMICOS/ARTICULOS DE LIMPIEZA",
+            "ventaM": 30.11,
+            "lyM": 29.38,
+            "varPct": 2.5,
+            "impactoM": 0.72
+        },
+        {
+            "categoria": "NINAS",
+            "ventaM": 0.98,
+            "lyM": 0.25,
+            "varPct": 298.1,
+            "impactoM": 0.74
+        },
+        {
+            "categoria": "PAPELES DOMESTICOS",
+            "ventaM": 27.3,
+            "lyM": 26.1,
+            "varPct": 4.6,
+            "impactoM": 1.21
+        },
+        {
+            "categoria": "NINOS",
+            "ventaM": 1.56,
+            "lyM": 0.22,
+            "varPct": 618.1,
+            "impactoM": 1.34
+        },
+        {
+            "categoria": "ABARROTES",
+            "ventaM": 226.71,
+            "lyM": 225.27,
+            "varPct": 0.6,
+            "impactoM": 1.44
+        },
+        {
+            "categoria": "LACTEOS",
+            "ventaM": 33.04,
+            "lyM": 31.6,
+            "varPct": 4.6,
+            "impactoM": 1.44
+        },
+        {
+            "categoria": "CONSUMIBLE BEBE",
+            "ventaM": 12.31,
+            "lyM": 10.84,
+            "varPct": 13.5,
+            "impactoM": 1.47
+        },
+        {
+            "categoria": "ROPA DE DORMIR",
+            "ventaM": 2.34,
+            "lyM": 0.52,
+            "varPct": 354.2,
+            "impactoM": 1.82
+        },
+        {
+            "categoria": "JARDINERIA",
+            "ventaM": 2.35,
+            "lyM": 0.38,
+            "varPct": 510.6,
+            "impactoM": 1.96
+        },
+        {
+            "categoria": "FERRETERIA",
+            "ventaM": 3.45,
+            "lyM": 1.41,
+            "varPct": 144.7,
+            "impactoM": 2.04
+        },
+        {
+            "categoria": "FRUTAS/VERDURAS/GRANOS",
+            "ventaM": 13.9,
+            "lyM": 11.75,
+            "varPct": 18.3,
+            "impactoM": 2.14
+        },
+        {
+            "categoria": "ALMUERZO DE CARNE",
+            "ventaM": 41.82,
+            "lyM": 39.38,
+            "varPct": 6.2,
+            "impactoM": 2.45
+        },
+        {
+            "categoria": "CUIDADO E HIGIENE CORPORAL",
+            "ventaM": 26.03,
+            "lyM": 21.53,
+            "varPct": 20.9,
+            "impactoM": 4.5
+        },
+        {
+            "categoria": "ALIMENTOS CONGELADOS",
+            "ventaM": 18.58,
+            "lyM": 13.42,
+            "varPct": 38.5,
+            "impactoM": 5.16
+        }
+    ]
+};
+
+        function renderSeptiembreCategorias() {
+            const meta = SEPTIEMBRE_DATA.meta;
+            document.getElementById('sept-subtitle').innerText =
+                `Local: ${meta.local} - Fuente: ${meta.fuente}`;
+            document.getElementById('sept-warn').innerText =
+                `Corte ${meta.corte}. Esto es venta MTD (mes a la fecha), no el mes cerrado.`;
+
+            document.getElementById('sept-kpi-venta').innerText = `$${meta.ventaMtdM.toFixed(1)}M`;
+            document.getElementById('sept-kpi-venta-sub').innerText = `LY: $${meta.ventaLyM.toFixed(1)}M`;
+
+            const varEl = document.getElementById('sept-kpi-var');
+            varEl.innerText = `${meta.varPct >= 0 ? '+' : ''}${meta.varPct.toFixed(1)}%`;
+            varEl.style.color = meta.varPct >= 0 ? '#2E7D32' : '#D32F2F';
+            document.getElementById('sept-kpi-var-sub').innerText =
+                `Gap: $${meta.gapM >= 0 ? '+' : ''}${meta.gapM.toFixed(2)}M`;
+
+            document.getElementById('sept-kpi-neg').innerText = meta.catNegativas;
+            document.getElementById('sept-kpi-neg-sub').innerText = `de ${meta.totalCategorias} con datos LY`;
+            document.getElementById('sept-kpi-pos').innerText = meta.catPositivas;
+            document.getElementById('sept-kpi-pos-sub').innerText = `de ${meta.totalCategorias} con datos LY`;
+
+            const posList = document.getElementById('sept-top-pos-list');
+            const negList = document.getElementById('sept-top-neg-list');
+            posList.innerHTML = '';
+            negList.innerHTML = '';
+
+            SEPTIEMBRE_DATA.topPositivas.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'analysis-item';
+                el.innerHTML = `
+                    <span class="analysis-name" title="${escapeHtml(item.categoria)}">${escapeHtml(item.categoria)}</span>
+                    <span class="trend-badge trend-up">+$${item.impactoM.toFixed(2)}M (${item.varPct >= 0 ? '+' : ''}${item.varPct.toFixed(1)}%)</span>
+                `;
+                posList.appendChild(el);
+            });
+
+            SEPTIEMBRE_DATA.topNegativas.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'analysis-item';
+                el.innerHTML = `
+                    <span class="analysis-name" title="${escapeHtml(item.categoria)}">${escapeHtml(item.categoria)}</span>
+                    <span class="trend-badge trend-down">$${item.impactoM.toFixed(2)}M (${item.varPct.toFixed(1)}%)</span>
+                `;
+                negList.appendChild(el);
+            });
+
+            // Tabla completa (todas las categorias visibles), resaltando el Top 3 / Bottom 3
+            const topPosNames = new Set(SEPTIEMBRE_DATA.topPositivas.map(i => i.categoria));
+            const topNegNames = new Set(SEPTIEMBRE_DATA.topNegativas.map(i => i.categoria));
+
+            const tbody = document.getElementById('sept-table-body');
+            tbody.innerHTML = SEPTIEMBRE_DATA.categorias.map(item => {
+                let rowBg = '';
+                if (topPosNames.has(item.categoria)) rowBg = 'background:rgba(76,175,80,0.10);';
+                else if (topNegNames.has(item.categoria)) rowBg = 'background:rgba(229,115,115,0.12);';
+                const varColor = item.varPct >= 0 ? '#2E7D32' : '#D32F2F';
+                const impColor = item.impactoM >= 0 ? '#2E7D32' : '#D32F2F';
+                return `
+                    <tr style="border-bottom:1px solid #f0f0f0;${rowBg}">
+                        <td style="padding:8px 12px;font-weight:600;">${escapeHtml(item.categoria)}</td>
+                        <td style="padding:8px 12px;text-align:right;">$${item.ventaM.toFixed(2)}M</td>
+                        <td style="padding:8px 12px;text-align:right;color:#888;">$${item.lyM.toFixed(2)}M</td>
+                        <td style="padding:8px 12px;text-align:right;font-weight:700;color:${varColor};">${item.varPct >= 0 ? '+' : ''}${item.varPct.toFixed(1)}%</td>
+                        <td style="padding:8px 12px;text-align:right;font-weight:700;color:${impColor};">${item.impactoM >= 0 ? '+' : ''}$${item.impactoM.toFixed(2)}M</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function populateSalesFilters() {
