@@ -1,4 +1,4 @@
-const CACHE_NAME = 'walmart-maestra-v6';
+const CACHE_NAME = 'walmart-maestra-v7'; // v7: agrega pestana Categorias Sept
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
