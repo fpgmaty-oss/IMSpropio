@@ -35,8 +35,10 @@ REPORT_PATH_DEFAULT = (
 INDEX_PATH = Path(__file__).parent / "index.html"
 
 BLOCK_START = "        // ---- Analisis de Categorias Septiembre 2026 (San Javier #155) ----"
-BLOCK_END_MARKER = "\n        function populateSalesFilters() {"
-ANCHOR_FALLBACK = "            applySalesFilters();\n        }\n"
+BLOCK_END_TAG = "        // ---- FIN Analisis de Categorias Septiembre ----\n"
+# Ancla estable de fin de <script> (independiente de otras pestanas generadas,
+# como Cyber). Se usa solo la primera vez que se inserta el bloque.
+ANCHOR_FALLBACK = "\n        init();\n    </script>"
 
 
 def to_millions(s):
@@ -196,7 +198,7 @@ def render_js_block(bundle):
                 `;
             }}).join('');
         }}
-"""
+{BLOCK_END_TAG}"""
 
 
 def patch_index(js_block):
@@ -205,12 +207,12 @@ def patch_index(js_block):
     if BLOCK_START in html:
         # Ya existe una version anterior: reemplazarla completa (idempotente)
         start = html.index(BLOCK_START)
-        end = html.index(BLOCK_END_MARKER, start)
-        html = html[:start] + js_block + "\n" + html[end + 1:]
+        end = html.index(BLOCK_END_TAG, start) + len(BLOCK_END_TAG)
+        html = html[:start] + js_block + html[end:]
     else:
-        # Primera vez: insertar antes de populateSalesFilters
+        # Primera vez: insertar justo antes del cierre del <script>
         assert ANCHOR_FALLBACK in html, "No se encontro el punto de insercion esperado"
-        html = html.replace(ANCHOR_FALLBACK, ANCHOR_FALLBACK + js_block + "\n", 1)
+        html = html.replace(ANCHOR_FALLBACK, "\n" + js_block + ANCHOR_FALLBACK, 1)
 
     INDEX_PATH.write_text(html, encoding="utf-8")
 

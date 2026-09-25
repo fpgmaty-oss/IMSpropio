@@ -23,7 +23,10 @@ from pathlib import Path
 INDEX_PATH = Path(__file__).parent / "index.html"
 
 BLOCK_START = "        // ---- Checklist Operativo Cyber (Barato a un Click) ----"
-BLOCK_END_MARKER = "\n        function populateSalesFilters() {"
+BLOCK_END_TAG = "        // ---- FIN Checklist Cyber ----\n"
+# Ancla estable de fin de <script> (independiente de otras pestanas generadas,
+# como Categorias Sept). Se usa solo la primera vez que se inserta el bloque.
+ANCHOR_FALLBACK = "\n        init();\n    </script>"
 
 CYBER_DATA = {
     "meta": {
@@ -237,7 +240,7 @@ def render_js_block():
 
             updateCyberProgress();
         }}
-"""
+{BLOCK_END_TAG}"""
 
 
 def patch_index(js_block):
@@ -245,11 +248,11 @@ def patch_index(js_block):
 
     if BLOCK_START in html:
         start = html.index(BLOCK_START)
-        end = html.index(BLOCK_END_MARKER, start)
-        html = html[:start] + js_block + "\n" + html[end + 1:]
+        end = html.index(BLOCK_END_TAG, start) + len(BLOCK_END_TAG)
+        html = html[:start] + js_block + html[end:]
     else:
-        assert BLOCK_END_MARKER in html, "No se encontro el punto de insercion esperado"
-        html = html.replace(BLOCK_END_MARKER, "\n" + js_block + BLOCK_END_MARKER, 1)
+        assert ANCHOR_FALLBACK in html, "No se encontro el punto de insercion esperado"
+        html = html.replace(ANCHOR_FALLBACK, "\n" + js_block + ANCHOR_FALLBACK, 1)
 
     INDEX_PATH.write_text(html, encoding="utf-8")
 

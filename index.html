@@ -934,8 +934,7 @@
 
             /* Botones de acción de filtros a todo ancho, alineados con los selects */
             #download-pdf,
-            #reset-filters,
-            #sales-reset-filters {
+            #reset-filters {
                 width: 100%;
             }
         }
@@ -1484,10 +1483,6 @@
             <span class="nav-icon">🔍</span>
             <span class="nav-label">Buscador</span>
         </button>
-        <button class="nav-btn" data-nav="ventas">
-            <span class="nav-icon">&#128200;</span>
-            <span class="nav-label">Ventas</span>
-        </button>
         <button class="nav-btn" data-nav="septiembre" title="Análisis de Categorías Septiembre">
             <span class="nav-icon">&#128202;</span>
             <span class="nav-label">Categorías Sept</span>
@@ -1565,96 +1560,6 @@
             <div id="loading-spinner" class="spinner-container hidden">
                 <div class="spinner"></div>
                 <p>Procesando datos...</p>
-            </div>
-        </section>
-
-        <!-- Ventas Section -->
-        <section id="ventas-section" class="hidden">
-            <!-- Upload Area for Sales -->
-            <div id="sales-upload-card" class="card shadow-sm pulse-animation">
-                <div class="upload-area" id="sales-drop-zone">
-                    <div class="upload-icon">📈</div>
-                    <h2>Cargar Reporte de Ventas</h2>
-                    <p>Arrastra tu archivo Excel de Ventas aquí o haz clic para subir</p>
-                    <input type="file" id="sales-file-input" accept=".xlsx, .xls, .csv" hidden>
-                    <button class="btn btn-primary" onclick="document.getElementById('sales-file-input').click()">Seleccionar Archivo</button>
-                </div>
-            </div>
-
-            <!-- Ventas Dashboard -->
-            <div id="sales-dashboard" class="hidden">
-                <!-- KPI summary cards -->
-                <div class="kpi-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                    <div class="card shadow-sm kpi-card" style="border-left: 5px solid var(--walmart-blue); padding: 1.25rem;">
-                        <div style="font-size: 0.75rem; text-transform: uppercase; color: #666; font-weight: 700; letter-spacing: 0.5px;">Venta Actual</div>
-                        <div id="kpi-venta-actual" style="font-size: 1.8rem; font-weight: 800; color: var(--walmart-blue); margin: 0.25rem 0;">$0</div>
-                        <div id="kpi-venta-actual-sub" style="font-size: 0.75rem; color: #888;">Cargado recientemente</div>
-                    </div>
-                    <div class="card shadow-sm kpi-card" style="border-left: 5px solid #757575; padding: 1.25rem;">
-                        <div style="font-size: 0.75rem; text-transform: uppercase; color: #666; font-weight: 700; letter-spacing: 0.5px;">Venta Año Anterior (LY)</div>
-                        <div id="kpi-venta-ly" style="font-size: 1.8rem; font-weight: 800; color: #555; margin: 0.25rem 0;">$0</div>
-                        <div style="font-size: 0.75rem; color: #888;">Misma ventana de tiempo</div>
-                    </div>
-                    <div class="card shadow-sm kpi-card" id="kpi-venta-var-card" style="border-left: 5px solid #E0E0E0; padding: 1.25rem;">
-                        <div style="font-size: 0.75rem; text-transform: uppercase; color: #666; font-weight: 700; letter-spacing: 0.5px;">Crecimiento (Var %)</div>
-                        <div id="kpi-venta-var" style="font-size: 1.8rem; font-weight: 800; margin: 0.25rem 0;">0.0%</div>
-                        <div id="kpi-venta-var-sub" style="font-size: 0.75rem; color: #888;">Comparado con LY</div>
-                    </div>
-                </div>
-
-                <!-- Fast analysis highlights -->
-                <div class="analysis-section" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
-                    <!-- Top Growth -->
-                    <div class="card shadow-sm" style="padding: 1.25rem; border-top: 4px solid #4CAF50;">
-                        <h3 style="color: #2E7D32; font-size: 1.1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">🚀 Top 3 Crecimiento</h3>
-                        <div id="top-growth-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
-                            <!-- Dynamically loaded -->
-                        </div>
-                    </div>
-                    <!-- Top Decline -->
-                    <div class="card shadow-sm" style="padding: 1.25rem; border-top: 4px solid #E57373;">
-                        <h3 style="color: #C62828; font-size: 1.1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">📉 Top 3 Decrecimiento</h3>
-                        <div id="top-decline-list" style="display: flex; flex-direction: column; gap: 0.5rem;">
-                            <!-- Dynamically loaded -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filters & Search for Sales -->
-                <div class="search-bar-container card shadow-sm" style="padding: 1.25rem; margin-bottom: 1.5rem; position: relative; top: 0; z-index: 10;">
-                    <div class="search-input-wrapper">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" id="sales-search-input" placeholder="Buscar categoría o departamento...">
-                        <button id="sales-toggle-filters-btn" class="btn btn-secondary btn-icon-only btn-filter-toggle" title="Mostrar/Ocultar Filtros">⚙️</button>
-                    </div>
-                    <div class="filters-row" id="sales-filters-row">
-                        <select id="sales-dept-filter" class="form-select">
-                            <option value="">Todos los Deptos</option>
-                        </select>
-                        <select id="sales-trend-filter" class="form-select">
-                            <option value="">Todas las Tendencias</option>
-                            <option value="creciendo">📈 Solo Creciendo (Var > 0%)</option>
-                            <option value="decreciendo">📉 Solo Decreciendo (Var < 0%)</option>
-                        </select>
-                        <select id="sales-sort-filter" class="form-select">
-                            <option value="venta-desc">Mayor Venta ($)</option>
-                            <option value="growth-desc">Mayor Crecimiento (%)</option>
-                            <option value="growth-asc">Mayor Decrecimiento (%)</option>
-                        </select>
-                        <button id="sales-clear-btn" class="btn btn-secondary" style="background: #E57373; color: white; border: none; border-radius: 20px;" title="Borrar Datos de Ventas">🗑️ Borrar Datos</button>
-                        <button id="sales-reload-btn" class="btn btn-secondary" style="background: var(--walmart-blue); color: white; border: none; border-radius: 20px;" title="Recargar datos del servidor">🔄 Recargar</button>
-                        <button id="sales-reset-filters" class="btn btn-text">Limpiar</button>
-                    </div>
-                </div>
-
-                <!-- Sales list count -->
-                <div class="stats-bar">
-                    <span id="sales-results-count">Categorías encontradas: 0</span>
-                    <span id="sales-total-count">Total: 0</span>
-                </div>
-
-                <!-- Sales Categories List -->
-                <div id="sales-list" class="results-grid"></div>
             </div>
         </section>
 
@@ -2012,8 +1917,6 @@
         // Global Store
         let storeData = [];
         let filteredData = [];
-        let salesData = [];
-        let filteredSalesData = [];
         const rowsPerPage = 50;
         let currentPage = 1;
         let expandedItemId = null;
@@ -2023,7 +1926,6 @@
         const DB_NAME = 'WalmartMaestraDB';
         const STORE_NAME = 'maestra_data';
         const PURCHASE_STORE = 'purchases';
-        const SALES_STORE = 'sales_data';
         const DB_VERSION = 3;
 
         // Elements
@@ -2054,26 +1956,12 @@
         const mainNavBtns = document.querySelectorAll('[data-nav]');
         const sections = {
             search: document.getElementById('search-section'),
-            ventas: document.getElementById('ventas-section'),
             septiembre: document.getElementById('septiembre-section'),
             cyber: document.getElementById('cyber-section'),
             materiales: document.getElementById('materiales-section'),
             pesables: document.getElementById('pesables-section'),
             conteo: document.getElementById('conteo-section')
         };
-        const salesUploadCard = document.getElementById('sales-upload-card');
-        const salesDashboard = document.getElementById('sales-dashboard');
-        const salesDropZone = document.getElementById('sales-drop-zone');
-        const salesFileInput = document.getElementById('sales-file-input');
-        const salesSearchInput = document.getElementById('sales-search-input');
-        const salesDeptFilter = document.getElementById('sales-dept-filter');
-        const salesTrendFilter = document.getElementById('sales-trend-filter');
-        const salesSortFilter = document.getElementById('sales-sort-filter');
-        const salesList = document.getElementById('sales-list');
-        const salesResultsCount = document.getElementById('sales-results-count');
-        const salesTotalCount = document.getElementById('sales-total-count');
-        const salesClearBtn = document.getElementById('sales-clear-btn');
-
         const materialesList = document.getElementById('materiales-list');
         const conteoInputList = document.getElementById('conteo-input-list');
         const btnProcessConteo = document.getElementById('btn-process-conteo');
@@ -2181,30 +2069,6 @@
             btnProcessConteo.onclick = processConteoList;
             btnConteoPdf.onclick = () => generatePDF(conteoFilteredData, "Conteo_Semanal");
 
-            // Eventos de la pestaña de Ventas
-            salesDropZone.onclick = () => salesFileInput.click();
-            salesFileInput.onchange = (e) => handleSalesFile(e.target.files[0]);
-            salesDropZone.ondragover = (e) => { e.preventDefault(); salesDropZone.classList.add('drag-over'); };
-            salesDropZone.ondragleave = () => salesDropZone.classList.remove('drag-over');
-            salesDropZone.ondrop = (e) => { e.preventDefault(); handleSalesFile(e.dataTransfer.files[0]); };
-
-            salesSearchInput.oninput = debounce(() => applySalesFilters(), 300);
-            salesDeptFilter.onchange = () => applySalesFilters();
-            salesTrendFilter.onchange = () => applySalesFilters();
-            salesSortFilter.onchange = () => applySalesFilters();
-            document.getElementById('sales-reset-filters').onclick = resetSalesFilters;
-            salesClearBtn.onclick = clearSalesPersistence;
-            document.getElementById('sales-reload-btn').onclick = async () => {
-                loadingSpinner.classList.remove('hidden');
-                const ok = await loadDefaultSales();
-                loadingSpinner.classList.add('hidden');
-                if (!ok) alert('No se pudo recargar desde el servidor. Verifica que Venta.xlsx esté publicado en GitHub.');
-            };
-
-            document.getElementById('sales-toggle-filters-btn').onclick = () => {
-                document.getElementById('sales-filters-row').classList.toggle('show');
-            };
-
             // Sub-pestañas de Materiales
             document.getElementById('tab-btn-mat-list').onclick = () => switchMaterialesSubTab('list');
             document.getElementById('tab-btn-mat-cal').onclick = () => switchMaterialesSubTab('calendar');
@@ -2259,7 +2123,6 @@
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
                     if (!db.objectStoreNames.contains(PURCHASE_STORE)) db.createObjectStore(PURCHASE_STORE);
-                    if (!db.objectStoreNames.contains(SALES_STORE)) db.createObjectStore(SALES_STORE);
                 };
                 request.onsuccess = (e) => resolve(e.target.result);
                 request.onerror = (e) => reject(e.target.error);
@@ -2293,10 +2156,7 @@
                 } else {
                     await loadDefaultMaestra();
                 }
-                
-                // Cargar también las ventas de IndexedDB
-                await loadSalesFromPersistence();
-            } catch (err) { console.error(err); }
+                            } catch (err) { console.error(err); }
         }
 
         // Convierte una fila cruda del Excel de Maestra al objeto que usa la app.
@@ -2453,7 +2313,6 @@
             sections[target].classList.remove('hidden');
 
             if (target === 'materiales') renderMateriales();
-            else if (target === 'ventas') renderSalesDashboard();
             else if (target === 'septiembre') renderSeptiembreCategorias();
             else if (target === 'cyber') renderCyberChecklist();
             else if (target === 'pesables') renderPesables();
@@ -3232,309 +3091,6 @@
             return num;
         }
 
-        function parseSalesJson(jsonData) {
-            const tempRows = [];
-            
-            for (const row of jsonData) {
-                let tienda = '';
-                let depto = '';
-                let categoria = '';
-                let venta = 0;
-                let ventaLy = 0;
-                let varPct = null;
-                
-                for (const key of Object.keys(row)) {
-                    const kTrim = key.trim();
-                    const kLow  = kTrim.toLowerCase();
-                    const val   = row[key];
-                    const str   = (val === null || val === undefined) ? '' : String(val);
-                    
-                    // Mapeo exacto primero, luego heurístico
-                    if (kTrim === 'Tienda' || kLow === 'tienda') {
-                        tienda = str;
-                    } else if (kTrim === 'Departamento' || kLow === 'departamento' || kLow === 'depto' || kLow === 'dept') {
-                        depto = str;
-                    } else if (kTrim === 'Categoría' || kTrim === 'Categoria' || kLow === 'categoría' || kLow === 'categoria' || kLow === 'category') {
-                        categoria = str;
-                    } else if (kTrim === 'Venta LY Var %' || kTrim === 'Venta Comp LY %') {
-                        // Columna de porcentaje como fracción en SheetJS (0.29 = 29%). Siempre * 100.
-                        if (val !== null && val !== undefined && val !== '') {
-                            const n = parseFloat(String(val));
-                            varPct = isNaN(n) ? null : parseFloat((n * 100).toFixed(1));
-                        }
-                    } else if (kTrim === 'Venta LY' || kLow === 'venta ly' || kLow === 'venta anterior') {
-                        ventaLy = parseNumber(val, false);
-                    } else if (kTrim === 'Venta' || kLow === 'venta' || kLow === 'ventas' || kLow === 'sales') {
-                        venta = parseNumber(val, false);
-                    }
-                }
-                
-                const cleanCat    = categoria.trim();
-                const cleanDepto  = depto.trim();
-                const cleanTienda = tienda.trim();
-                
-                // Omitir filas de gran total y filas completamente vacías
-                if (!cleanCat && !cleanDepto) continue;
-                // Omitir fila de Departamento="Total" (gran total general) y fila de Tienda="Total"
-                if (cleanDepto.toLowerCase() === 'total' || cleanTienda.toLowerCase() === 'total') continue;
-                // Fila de "Filtros aplicados" y similares: sin venta ni datos útiles
-                if (!venta && !ventaLy && !cleanCat) continue;
-                
-                // Calcular variación si no se proveyó o es null
-                if (varPct === null || isNaN(varPct)) {
-                    if (ventaLy !== 0) {
-                        varPct = parseFloat((((venta - ventaLy) / ventaLy) * 100).toFixed(1));
-                    } else {
-                        varPct = venta > 0 ? 100.0 : 0.0;
-                    }
-                }
-                
-                tempRows.push({
-                    tienda:   cleanTienda || '155 - San Javier',
-                    depto:    cleanDepto  || 'General',
-                    categoria: cleanCat  || cleanDepto || 'General',
-                    venta,
-                    ventaLy,
-                    varPct
-                });
-            }
-            
-            // Agrupar por departamento y filtrar subtotales (filas con Categoría = "Total")
-            const deptoGroups = {};
-            for (const r of tempRows) {
-                if (!deptoGroups[r.depto]) deptoGroups[r.depto] = [];
-                deptoGroups[r.depto].push(r);
-            }
-            
-            const finalRows = [];
-            for (const deptoName of Object.keys(deptoGroups)) {
-                const group = deptoGroups[deptoName];
-                
-                // Categorías reales (no son fila de Total)
-                const leafCategories = group.filter(r => r.categoria.toLowerCase() !== 'total');
-                
-                if (leafCategories.length > 0) {
-                    // Departamento con desglose de categorías: usar solo las categorías reales
-                    finalRows.push(...leafCategories);
-                } else {
-                    // Departamento sin desglose: renombrar la categoría al nombre del departamento
-                    group.forEach(r => {
-                        r.categoria = r.depto;
-                        finalRows.push(r);
-                    });
-                }
-            }
-            
-            return finalRows;
-        }
-
-        async function handleSalesFile(file) {
-            if (!file) return;
-            loadingSpinner.classList.remove('hidden');
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const sheetName = workbook.SheetNames[0];
-                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-                    
-                    const parsed = parseSalesJson(jsonData);
-                    if (parsed.length === 0) {
-                        alert("No se encontraron columnas de ventas válidas en el archivo (se requiere al menos Categoría y Venta).");
-                        return;
-                    }
-                    
-                    salesData = parsed;
-                    const time = new Date().toLocaleString();
-                    await saveSalesToPersistence(parsed);
-                    showSalesUI(time);
-                } catch (err) {
-                    console.error(err);
-                    alert("Error al procesar archivo de ventas: " + err.message);
-                } finally {
-                    loadingSpinner.classList.add('hidden');
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        async function saveSalesToPersistence(data) {
-            try {
-                const db = await openDB();
-                const tx = db.transaction(SALES_STORE, 'readwrite');
-                const store = tx.objectStore(SALES_STORE);
-                await store.put(data, 'current_sales');
-                const time = new Date().toLocaleString();
-                await store.put(time, 'last_sales_upload_time');
-            } catch (err) { console.error("Error al guardar ventas:", err); }
-        }
-
-        async function loadSalesFromPersistence() {
-            try {
-                // Siempre intentar cargar la versión más reciente desde el servidor (GitHub Pages).
-                // IndexedDB se usa solo como fallback si el servidor no está disponible.
-                const loaded = await loadDefaultSales();
-                if (!loaded) {
-                    const db = await openDB();
-                    const tx = db.transaction(SALES_STORE, 'readonly');
-                    const store = tx.objectStore(SALES_STORE);
-                    const data = await getRequest(store.get('current_sales'));
-                    const time = await getRequest(store.get('last_sales_upload_time'));
-                    if (data && data.length > 0) {
-                        salesData = data;
-                        showSalesUI(time + ' (Caché)');
-                    }
-                }
-            } catch (err) { console.error('Error al cargar ventas persistidas:', err); }
-        }
-
-        const VENTA_CANDIDATE_PATHS = buildXlsxCandidatePaths('Venta', 'VENTA');
-
-        async function loadDefaultSales() {
-            try {
-                let response = null;
-                for (const path of VENTA_CANDIDATE_PATHS) {
-                    try {
-                        const candidate = await fetch(path);
-                        if (candidate.ok) { response = candidate; break; }
-                    } catch (e) { /* probar siguiente ruta */ }
-                }
-                if (!response) return false;
-                
-                const buffer = await response.arrayBuffer();
-                const data = new Uint8Array(buffer);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheetName = workbook.SheetNames[0];
-                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-                
-                const parsed = parseSalesJson(jsonData);
-                if (parsed.length > 0) {
-                    salesData = parsed;
-                    const time = new Date().toLocaleString();
-                    await saveSalesToPersistence(parsed);
-                    showSalesUI(time);
-                    return true;
-                }
-                return false;
-            } catch (err) {
-                console.error('Error al cargar ventas predeterminadas:', err);
-                return false;
-            }
-        }
-
-        async function clearSalesPersistence() {
-            if (!confirm("¿Borrar todos los datos de ventas de la memoria del navegador?")) return;
-            try {
-                const db = await openDB();
-                const tx = db.transaction(SALES_STORE, 'readwrite');
-                tx.objectStore(SALES_STORE).clear();
-                salesData = [];
-                filteredSalesData = [];
-                
-                salesDashboard.classList.add('hidden');
-                salesUploadCard.classList.remove('hidden');
-                alert("Datos de ventas eliminados.");
-            } catch (err) { console.error(err); }
-        }
-
-        function showSalesUI(time) {
-            salesUploadCard.classList.add('hidden');
-            salesDashboard.classList.remove('hidden');
-            populateSalesFilters();
-            
-            // Colocar hora de actualización
-            document.getElementById('kpi-venta-actual-sub').innerText = `Última carga: ${time}`;
-            
-            renderSalesDashboard();
-        }
-
-        function renderSalesDashboard() {
-            if (salesData.length === 0) return;
-            
-            // Computar Totales
-            let totalVenta = 0;
-            let totalVentaLy = 0;
-            
-            for (const item of salesData) {
-                totalVenta += item.venta;
-                totalVentaLy += item.ventaLy;
-            }
-            
-            let totalVar = 0;
-            if (totalVentaLy !== 0) {
-                totalVar = ((totalVenta - totalVentaLy) / totalVentaLy) * 100;
-            } else {
-                totalVar = totalVenta > 0 ? 100 : 0;
-            }
-            
-            // Rellenar KPIs
-            document.getElementById('kpi-venta-actual').innerText = `$${Math.round(totalVenta).toLocaleString('es-CL')}`;
-            document.getElementById('kpi-venta-ly').innerText = `$${Math.round(totalVentaLy).toLocaleString('es-CL')}`;
-            
-            const kpiVar = document.getElementById('kpi-venta-var');
-            const kpiVarCard = document.getElementById('kpi-venta-var-card');
-            kpiVar.innerText = `${totalVar >= 0 ? '+' : ''}${totalVar.toFixed(1)}%`;
-            
-            if (totalVar > 0) {
-                kpiVar.style.color = '#2E7D32';
-                kpiVarCard.style.borderLeft = '5px solid #4CAF50';
-            } else if (totalVar < 0) {
-                kpiVar.style.color = '#D32F2F';
-                kpiVarCard.style.borderLeft = '5px solid #E57373';
-            } else {
-                kpiVar.style.color = '#757575';
-                kpiVarCard.style.borderLeft = '5px solid #E0E0E0';
-            }
-            
-            // Análisis Rápido: Top 3 Crecimiento y Top 3 Caída
-            // Filtrar categorías con ventas representativas (ej: > $20.000) para evitar distorsiones por montos muy pequeños
-            const representativeCategories = salesData.filter(i => i.venta > 20000 || i.ventaLy > 20000);
-            
-            const sortedByGrowth = [...representativeCategories].sort((a, b) => b.varPct - a.varPct);
-            const sortedByDecline = [...representativeCategories].sort((a, b) => a.varPct - b.varPct);
-            
-            const topGrowth = sortedByGrowth.slice(0, 3).filter(i => i.varPct > 0);
-            const topDecline = sortedByDecline.slice(0, 3).filter(i => i.varPct < 0);
-            
-            const growthList = document.getElementById('top-growth-list');
-            const declineList = document.getElementById('top-decline-list');
-            
-            growthList.innerHTML = '';
-            declineList.innerHTML = '';
-            
-            if (topGrowth.length === 0) {
-                growthList.innerHTML = '<div style="font-size: 0.8rem; color: #888; font-style: italic;">Sin incrementos</div>';
-            } else {
-                topGrowth.forEach(item => {
-                    const el = document.createElement('div');
-                    el.className = 'analysis-item';
-                    el.innerHTML = `
-                        <span class="analysis-name" title="${item.categoria}">${escapeHtml(item.categoria)}</span>
-                        <span class="trend-badge trend-up">▲ ${item.varPct}%</span>
-                    `;
-                    growthList.appendChild(el);
-                });
-            }
-            
-            if (topDecline.length === 0) {
-                declineList.innerHTML = '<div style="font-size: 0.8rem; color: #888; font-style: italic;">Sin declinaciones</div>';
-            } else {
-                topDecline.forEach(item => {
-                    const el = document.createElement('div');
-                    el.className = 'analysis-item';
-                    el.innerHTML = `
-                        <span class="analysis-name" title="${item.categoria}">${escapeHtml(item.categoria)}</span>
-                        <span class="trend-badge trend-down">▼ ${item.varPct}%</span>
-                    `;
-                    declineList.appendChild(el);
-                });
-            }
-            
-            applySalesFilters();
-        }
-
-
         // ---- Analisis de Categorias Septiembre 2026 (San Javier #155) ----
         // Datos horneados desde el reporte fuente (snapshot MTD). Para actualizar
         // a un nuevo mes/corte, correr build_septiembre_tab.py de nuevo con el
@@ -4020,6 +3576,7 @@
                 `;
             }).join('');
         }
+        // ---- FIN Analisis de Categorias Septiembre ----
 
         // ---- Checklist Operativo Cyber (Barato a un Click) ----
         // Datos horneados desde el webinar operativo de la campana. Para una
@@ -4260,194 +3817,7 @@
 
             updateCyberProgress();
         }
-
-        function populateSalesFilters() {
-            const depts = [...new Set(salesData.map(i => i.depto))].sort();
-            salesDeptFilter.innerHTML = '<option value="">Todos los Deptos</option>';
-            depts.forEach(d => {
-                if (d) {
-                    let opt = document.createElement('option');
-                    opt.value = d;
-                    opt.innerText = d;
-                    salesDeptFilter.appendChild(opt);
-                }
-            });
-        }
-
-        function applySalesFilters() {
-            const query = salesSearchInput.value.toLowerCase().trim();
-            const dept = salesDeptFilter.value;
-            const trend = salesTrendFilter.value;
-            const sortVal = salesSortFilter.value;
-            
-            filteredSalesData = salesData.filter(item => {
-                const matchesQuery = !query || item.categoria.toLowerCase().includes(query) || item.depto.toLowerCase().includes(query);
-                const matchesDept = !dept || item.depto === dept;
-                
-                let matchesTrend = true;
-                if (trend === 'creciendo') matchesTrend = item.varPct > 0;
-                else if (trend === 'decreciendo') matchesTrend = item.varPct < 0;
-                
-                return matchesQuery && matchesDept && matchesTrend;
-            });
-            
-            // Ordenar
-            if (sortVal === 'venta-desc') {
-                filteredSalesData.sort((a, b) => b.venta - a.venta);
-            } else if (sortVal === 'growth-desc') {
-                filteredSalesData.sort((a, b) => b.varPct - a.varPct);
-            } else if (sortVal === 'growth-asc') {
-                filteredSalesData.sort((a, b) => a.varPct - b.varPct);
-            }
-            
-            salesResultsCount.innerText = `Categorías encontradas: ${filteredSalesData.length}`;
-            salesTotalCount.innerText = `Total: ${salesData.length}`;
-            
-            renderSalesList();
-        }
-
-        function resetSalesFilters() {
-            salesSearchInput.value = '';
-            salesDeptFilter.value = '';
-            salesTrendFilter.value = '';
-            salesSortFilter.value = 'venta-desc';
-            applySalesFilters();
-        }
-
-        function renderSalesList() {
-            salesList.innerHTML = '';
-            
-            if (filteredSalesData.length === 0) {
-                salesList.innerHTML = '<div class="no-results card">Sin resultados en ventas.</div>';
-                return;
-            }
-            
-            const fragment = document.createDocumentFragment();
-            filteredSalesData.forEach((item, idx) => {
-                const card = document.createElement('div');
-                card.className = 'result-card';
-                
-                const varPct = item.varPct;
-                const isGrowth = varPct > 0;
-                const isDecline = varPct < 0;
-                
-                const trendClass = isGrowth ? 'trend-up' : (isDecline ? 'trend-down' : 'trend-neutral');
-                const trendIcon = isGrowth ? '▲' : (isDecline ? '▼' : '▬');
-                const sign = isGrowth ? '+' : '';
-                
-                // Barra de variación visual topada en 100% de magnitud
-                const absVar = Math.min(Math.abs(varPct), 100);
-                const barColorClass = isGrowth ? 'growth-positive' : 'growth-negative';
-                
-                card.innerHTML = `
-                    <div class="card-main" style="grid-template-columns: 1fr; gap: 0.5rem; padding: 1.25rem 1.5rem 0.75rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-                            <div style="text-align: left;">
-                                <h3 style="font-size: 1.1rem; color: var(--walmart-text); font-weight: 700;">${escapeHtml(item.categoria)}</h3>
-                                <span class="tag tag-dept" style="margin-top: 4px; display: inline-block;">Depto ${escapeHtml(item.depto)}</span>
-                            </div>
-                            <span class="trend-badge ${trendClass}">${trendIcon} ${sign}${varPct}%</span>
-                        </div>
-                        
-                        <div style="display: flex; justify-content: space-between; width: 100%; margin-top: 0.5rem; font-size: 0.9rem;">
-                            <div style="text-align: left;">
-                                <div style="color: #757575; font-size: 0.75rem; text-transform: uppercase;">Venta Actual</div>
-                                <strong style="color: var(--walmart-blue); font-size: 1.1rem;">$${Math.round(item.venta).toLocaleString('es-CL')}</strong>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="color: #757575; font-size: 0.75rem; text-transform: uppercase;">Venta LY</div>
-                                <strong style="color: #555; font-size: 1.1rem;">$${Math.round(item.ventaLy).toLocaleString('es-CL')}</strong>
-                            </div>
-                        </div>
-                        
-                        <!-- Barra visual del Crecimiento -->
-                        <div class="growth-bar-container">
-                            <div class="growth-bar ${barColorClass}" style="width: ${absVar}%"></div>
-                        </div>
-                    </div>
-                    
-                    <div id="sales-detail-${idx}" class="card-detail">
-                        <!-- Rellenado dinámicamente con productos -->
-                    </div>
-                    
-                    <div class="item-footer" style="padding: 0.5rem 1.5rem; background: #F8F9FA;">
-                        <span style="font-size: 0.8rem; color: #757575;">Toca para ver productos de esta categoría</span>
-                        <span class="item-number" style="background: var(--walmart-blue); cursor: pointer;">🔍 Ver Productos</span>
-                    </div>
-                `;
-                
-                card.onclick = () => toggleExpandSalesCategory(item.categoria, idx);
-                fragment.appendChild(card);
-            });
-            
-            salesList.appendChild(fragment);
-        }
-
-        let expandedSalesIdx = null;
-        
-        async function toggleExpandSalesCategory(categoryName, idx) {
-            const detail = document.getElementById(`sales-detail-${idx}`);
-            const isExpanded = detail.classList.contains('expanded');
-            
-            if (expandedSalesIdx !== null && expandedSalesIdx !== idx) {
-                const prev = document.getElementById(`sales-detail-${expandedSalesIdx}`);
-                if (prev) prev.classList.remove('expanded');
-            }
-            
-            if (isExpanded) {
-                detail.classList.remove('expanded');
-                expandedSalesIdx = null;
-            } else {
-                detail.classList.add('expanded');
-                expandedSalesIdx = idx;
-                
-                const cleanCatName = categoryName.trim().toUpperCase();
-                const matchingProducts = storeData.filter(p => p.categoria.trim().toUpperCase() === cleanCatName);
-                
-                let html = '';
-                html += `
-                    <div class="product-sublist-container">
-                        <div class="product-sublist-title">Productos en Maestra para esta Categoría</div>
-                `;
-                
-                if (storeData.length === 0) {
-                    html += `
-                        <div style="font-size: 0.85rem; color: #D32F2F; background: #FFEBEE; padding: 10px; border-radius: 6px; border: 1px solid #FFCDD2; text-align: center; font-weight: 600;">
-                            ⚠️ Maestra de Tienda no cargada. Cargue la Maestra en el Buscador para mapear los productos de esta categoría.
-                        </div>
-                    `;
-                } else if (matchingProducts.length === 0) {
-                    html += `
-                        <div style="font-size: 0.85rem; color: #E65100; background: #FFF3E0; padding: 10px; border-radius: 6px; border: 1px solid #FFE0B2; text-align: center; font-weight: 600;">
-                            ℹ️ No se encontraron productos específicos bajo la categoría "${escapeHtml(categoryName)}" en la Maestra.
-                        </div>
-                    `;
-                } else {
-                    html += `<div class="product-sublist">`;
-                    matchingProducts.forEach(prod => {
-                        const isAdj = String(prod.ajustado).toUpperCase().startsWith('S');
-                        html += `
-                            <div class="product-sublist-item">
-                                <div class="product-sublist-info" style="text-align: left;">
-                                    <strong>${escapeHtml(prod.description)}</strong>
-                                    <span>SKU: #${prod.sku} | ITEM: ${prod.itemNum} | Proveedor: ${escapeHtml(prod.proveedor)}</span>
-                                </div>
-                                <div class="product-sublist-metrics">
-                                    <span class="tag" style="background:${prod.stock <= 0 ? '#FFEBEE' : '#E8F5E9'};color:${prod.stock <= 0 ? '#D32F2F' : '#2E7D32'}">Stock: ${prod.stock}</span>
-                                    <span class="tag tag-status">Status: ${escapeHtml(prod.status)}</span>
-                                    <span class="tag ${isAdj ? 'tag-adj' : 'tag-no-adj'}">${isAdj ? '✅' : '❌'} Ajustado</span>
-                                    <strong style="color: var(--walmart-blue); margin-left: 5px;">$${Number(prod.price).toLocaleString('es-CL')}</strong>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    html += `</div>`;
-                }
-                
-                html += `</div>`;
-                detail.innerHTML = html;
-            }
-        }
+        // ---- FIN Checklist Cyber ----
 
         init();
     </script>

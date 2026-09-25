@@ -1,4 +1,4 @@
-const CACHE_NAME = 'walmart-maestra-v9'; // v9: rediseno ludico pestana Cyber (3 secciones)
+const CACHE_NAME = 'walmart-maestra-v10'; // v10: elimina pestana Ventas standalone (redundante)
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
