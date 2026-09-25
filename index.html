@@ -1131,6 +1131,163 @@
             max-width: 70%;
         }
 
+        /* ---- Cyber Tab (Barato a un Click) ---- */
+        .cyber-hero-header {
+            background: linear-gradient(135deg, var(--walmart-blue) 0%, #004C91 55%, #7a5200 150%);
+            color: white;
+            border-radius: 16px;
+            padding: 1.75rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyber-hero-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -8%;
+            width: 220px;
+            height: 220px;
+            background: rgba(255, 194, 32, 0.28);
+            border-radius: 50%;
+        }
+
+        .cyber-kpi-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .cyber-kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14);
+        }
+
+        .cyber-chip {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            min-width: 150px;
+            transition: transform 0.15s ease;
+        }
+
+        .cyber-chip:hover {
+            transform: scale(1.05);
+        }
+
+        .cyber-rule-card {
+            background: linear-gradient(135deg, #FFFDF5, #FFF6DC);
+            border: 2px solid var(--walmart-yellow);
+            border-radius: 14px;
+            padding: 1rem 1.1rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .cyber-rule-card:hover {
+            transform: translateY(-3px) scale(1.015);
+            box-shadow: 0 10px 22px rgba(255, 194, 32, 0.4);
+        }
+
+        .cyber-step-item {
+            display: flex;
+            gap: 0.85rem;
+            padding: 10px 0;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cyber-step-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 17px;
+            top: 38px;
+            bottom: -10px;
+            width: 2px;
+            background: #E0E0E0;
+        }
+
+        .cyber-step-badge {
+            flex-shrink: 0;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            font-size: 0.9rem;
+            z-index: 1;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .cyber-step-badge.done {
+            background: #4CAF50 !important;
+            transform: scale(1.12);
+        }
+
+        .cyber-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 2px solid #BDBDBD;
+            cursor: pointer;
+            flex-shrink: 0;
+            position: relative;
+            transition: all 0.15s ease;
+        }
+
+        .cyber-checkbox:checked {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            transform: scale(1.08);
+        }
+
+        .cyber-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 6px;
+            height: 11px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .cyber-item-text {
+            font-size: 0.9rem;
+            transition: color 0.15s ease;
+        }
+
+        .cyber-progress-track {
+            background: #EEF1F4;
+            border-radius: 20px;
+            height: 22px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .cyber-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A, #4CAF50);
+            background-size: 200% 100%;
+            animation: cyberProgressShine 2s linear infinite;
+            transition: width 0.4s ease;
+            border-radius: 20px;
+        }
+
+        @keyframes cyberProgressShine {
+            0% { background-position: 0% 0; }
+            100% { background-position: 200% 0; }
+        }
+
         .product-sublist-container {
             padding: 1rem 1.5rem 1.5rem;
             background-color: #F8F9FA;
@@ -1336,7 +1493,7 @@
             <span class="nav-label">Categorías Sept</span>
         </button>
         <button class="nav-btn" data-nav="cyber" title="Checklist Barato a un Click">
-            <span class="nav-icon">&#9989;</span>
+            <span class="nav-icon">&#9889;</span>
             <span class="nav-label">Cyber</span>
         </button>
         <button class="nav-btn" data-nav="materiales">
@@ -1740,43 +1897,33 @@
 
         <!-- Cyber Barato a un Click Section -->
         <section id="cyber-section" class="hidden">
-            <div class="card shadow-sm" style="padding: 1.25rem; margin-bottom: 1.5rem; border-left: 5px solid var(--walmart-yellow);">
-                <h2 style="margin-bottom: 0.25rem;">Barato a un Click - Checklist Operativo</h2>
-                <p style="font-size: 0.85rem; color: #666;" id="cyber-subtitle"></p>
+            <div class="cyber-hero-header" style="margin-bottom: 1.5rem;">
+                <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;opacity:0.85;font-weight:700;">&#9889; Campana Cyber</div>
+                <h2 style="margin-bottom: 0.25rem;font-size:1.5rem;position:relative;">Barato a un Click</h2>
+                <p style="font-size: 0.9rem; opacity: 0.9;position:relative;" id="cyber-subtitle"></p>
             </div>
 
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem;">
-                <div class="card shadow-sm" style="border-left:5px solid #4CAF50;padding:1.25rem;">
-                    <div style="font-size:0.75rem;text-transform:uppercase;color:#666;font-weight:700;">Meta Venta Campana</div>
-                    <div id="cyber-kpi-venta" style="font-size:1.6rem;font-weight:800;color:#2E7D32;"></div>
+                <div class="card shadow-sm cyber-kpi-card" style="border-left:5px solid #4CAF50;padding:1.25rem;">
+                    <div style="font-size:0.75rem;text-transform:uppercase;color:#666;font-weight:700;">&#128176; Meta Venta Campana</div>
+                    <div id="cyber-kpi-venta" style="font-size:1.7rem;font-weight:800;color:#2E7D32;"></div>
                     <div id="cyber-kpi-venta-sub" style="font-size:0.75rem;color:#888;"></div>
                 </div>
-                <div class="card shadow-sm" style="border-left:5px solid var(--walmart-blue);padding:1.25rem;">
-                    <div style="font-size:0.75rem;text-transform:uppercase;color:#666;font-weight:700;">Meta Pedidos Red</div>
-                    <div id="cyber-kpi-pedidos" style="font-size:1.6rem;font-weight:800;color:var(--walmart-blue);"></div>
+                <div class="card shadow-sm cyber-kpi-card" style="border-left:5px solid var(--walmart-blue);padding:1.25rem;">
+                    <div style="font-size:0.75rem;text-transform:uppercase;color:#666;font-weight:700;">&#128230; Meta Pedidos Red</div>
+                    <div id="cyber-kpi-pedidos" style="font-size:1.7rem;font-weight:800;color:var(--walmart-blue);"></div>
                     <div id="cyber-kpi-pedidos-sub" style="font-size:0.75rem;color:#888;"></div>
                 </div>
-                <div class="card shadow-sm" style="border-left:5px solid #757575;padding:1.25rem;">
-                    <div style="font-size:0.75rem;text-transform:uppercase;color:#666;font-weight:700;">Dotacion Planificada W40</div>
-                    <div id="cyber-kpi-dotacion" style="font-size:1.6rem;font-weight:800;color:#555;"></div>
+                <div class="card shadow-sm cyber-kpi-card" style="border-left:5px solid var(--walmart-yellow);padding:1.25rem;">
+                    <div style="font-size:0.75rem;text-transform:uppercase;color:#666;font-weight:700;">&#128101; Dotacion Planificada W40</div>
+                    <div id="cyber-kpi-dotacion" style="font-size:1.7rem;font-weight:800;color:#7a5200;"></div>
                     <div style="font-size:0.75rem;color:#888;">Red total</div>
                 </div>
             </div>
 
             <div class="card shadow-sm" style="padding:1.25rem;margin-bottom:1.5rem;">
-                <h2 style="margin-bottom:1rem;">Categorias Foco de la Campana</h2>
-                <div style="overflow-x:auto;">
-                    <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
-                        <thead>
-                            <tr style="background:#f8f9fa;">
-                                <th style="text-align:left;padding:6px 10px;">Tribu</th>
-                                <th style="text-align:left;padding:6px 10px;">Categoria</th>
-                                <th style="text-align:right;padding:6px 10px;">Descuento / Precio</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cyber-foco-body"></tbody>
-                    </table>
-                </div>
+                <h2 style="margin-bottom:1rem;">&#127942; Categorias Foco de la Campana</h2>
+                <div id="cyber-foco-body" style="display:flex;flex-wrap:wrap;gap:0.75rem;"></div>
             </div>
 
             <div class="card shadow-sm" style="padding:1.25rem;margin-bottom:1.5rem;">
@@ -1784,9 +1931,10 @@
                     <h2>Progreso del Checklist</h2>
                     <button class="btn btn-text" onclick="resetCyberChecklist()">Reiniciar</button>
                 </div>
-                <div id="cyber-progress-text" style="font-weight:700;color:var(--walmart-blue);margin-bottom:0.5rem;"></div>
-                <div style="background:#f0f0f0;border-radius:6px;height:12px;overflow:hidden;">
-                    <div id="cyber-progress-bar" style="background:linear-gradient(90deg,#4CAF50,#2E7D32);height:12px;width:0%;transition:width 0.3s;"></div>
+                <div id="cyber-progress-text" style="font-weight:800;color:var(--walmart-blue);margin-bottom:0.15rem;font-size:1.1rem;"></div>
+                <div id="cyber-progress-msg" style="font-size:0.85rem;color:#888;margin-bottom:0.6rem;font-style:italic;"></div>
+                <div class="cyber-progress-track">
+                    <div id="cyber-progress-bar" class="cyber-progress-fill" style="width:0%;"></div>
                 </div>
             </div>
 
@@ -3937,6 +4085,7 @@
     "checklist": [
         {
             "seccion": "Reglas de Oro Generales",
+            "tipo": "reglas",
             "items": [
                 "Shoppers: ingreso 7:30 hrs",
                 "Botonera / Reloj Operativo cargado 100% desde el inicio de turno",
@@ -3948,44 +4097,9 @@
             ]
         },
         {
-            "seccion": "Turno Noche (22:00 - 06:30)",
-            "items": [
-                "21:00 - Trabajar itemes futuros",
-                "22:00-22:15 - Reunion de planificacion y entrega de herramientas",
-                "22:15-23:00 - Clasificacion de mercaderia / armado de carros",
-                "23:00-04:30 - Reposicion 4x1",
-                "Ajustes de categorias Top Venta + reposicion estricta de los Nunca Sin",
-                "Doble check en Torre de Control: pedidos PU V09:00 del dia siguiente armados",
-                "Carga de relojes PU y congelado de Gel Packs",
-                "04:30-05:30 - Verificar itemes futuros, identificar quiebres con RF, bajar del bin",
-                "05:30-06:00 - Bineo de excedentes (protocolo Espejeo de Bins)",
-                "06:00-06:30 - Orden y retiro de cartones"
-            ]
-        },
-        {
-            "seccion": "Turno AM (06:30 - 14:00)",
-            "items": [
-                "Asignacion fija de personal en digital AM",
-                "Checklist basico: Reloj, Botonera, Torre, Gel Packs",
-                "Asignar armado de pedidos V9, V11 y V13",
-                "Revision de la Torre cada 1 hora",
-                "Revision de completitud en BI y gestion de quiebres",
-                "12:00 hrs (antes de almuerzo): trabajar itemes futuros"
-            ]
-        },
-        {
-            "seccion": "Turno PM (14:00 - 22:00)",
-            "items": [
-                "Asignacion fija de personal en digital PM",
-                "Checklist basico: Reloj, Botonera, Torre, Gel Packs",
-                "Asignar armado de pedidos V15, V17 y V19",
-                "Reposicion en sala segun demanda",
-                "Revision de la Torre cada 1 hora y de completitud en BI",
-                "17:00-21:00 (Regla de Oro): 1 persona DEDICADA EXCLUSIVAMENTE a entregar pedidos Pick-Up (60% de las entregas PU ocurren en este bloque)"
-            ]
-        },
-        {
             "seccion": "Rutina Alertas NSG",
+            "tipo": "pasos",
+            "color": "#0053e2",
             "items": [
                 "07:30-12:30 - Imprimir alertas NSG",
                 "Ingresar a la aplicacion IMS",
@@ -3999,6 +4113,8 @@
         },
         {
             "seccion": "Rutina Itemes Futuros",
+            "tipo": "pasos",
+            "color": "#2E7D32",
             "items": [
                 "Imprimir itemes futuros e itemes top quiebre (horarios: 08:00, 11:00, 13:00, 15:00, 17:00, 19:00)",
                 "Entregar los dos reportes a personal asignado",
@@ -4006,40 +4122,6 @@
                 "Personal asignado repone itemes, prioridad en top quiebres",
                 "Priorizar por cantidad de unidades vendidas, trabajar itemes del mismo dia",
                 "Entregar reporte a Gerente de Tienda para definir nuevos focos"
-            ]
-        },
-        {
-            "seccion": "Reunion de Planificacion (diaria)",
-            "items": [
-                "Revisar dotacion vs planificacion (Calculadora)",
-                "Asignacion alertas NSG (Mi Repo) 13:00 a 17:00",
-                "Asignacion itemes futuros 08:00 a 20:00",
-                "Asignacion horneo de pan y pollo",
-                "Asignacion zona de pago",
-                "Caminata sala de ventas: revisar reposicion de itemes top venta de la campana",
-                "Caminata sala de ventas: revisar quiebres visibles"
-            ]
-        },
-        {
-            "seccion": "Rutina Gerente de Tienda",
-            "items": [
-                "07:00-21:00 - Recepcion de camiones",
-                "21:00-22:00 (previo a turno noche) - Posicionamiento de pallets en sala de venta",
-                "21:00-22:00 - Gestion de devoluciones"
-            ]
-        },
-        {
-            "seccion": "Metas / KPI a monitorear a diario",
-            "items": [
-                "Nuevo NSG >= 96%",
-                "Completitud >= 96%",
-                "Pallets por persona >= 4",
-                "Pickup - Armado a tiempo > 96%",
-                "Pickup - Completitud SS > 97% / Completitud CS > 98%",
-                "Pickup - TEP < 5 minutos / % Promesa > 85%",
-                "Home Delivery - Armado a tiempo > 96%",
-                "Home Delivery - Completitud SS > 97% / Completitud CS > 98%",
-                "Home Delivery - OTEA > 96% / Same Day > 90% / N2H > 80%"
             ]
         }
     ]
@@ -4080,25 +4162,82 @@
                 });
             });
             const pct = total ? Math.round((done / total) * 100) : 0;
-            document.getElementById('cyber-progress-text').innerText =
-                `${done} / ${total} tareas completadas (${pct}%)`;
+
+            let mensaje = 'Vamos que se puede, arranca marcando la primera tarea';
+            if (pct >= 100) mensaje = 'Local listo para el Cyber. Gran trabajo del equipo &#127881;';
+            else if (pct >= 70) mensaje = 'Ya casi. Los ultimos detalles hacen la diferencia';
+            else if (pct >= 30) mensaje = 'Vas bien encaminado, dale que se puede';
+
+            document.getElementById('cyber-progress-text').innerText = `${done} / ${total} tareas completadas (${pct}%)`;
+            document.getElementById('cyber-progress-msg').innerHTML = mensaje;
             document.getElementById('cyber-progress-bar').style.width = `${pct}%`;
 
-            document.querySelectorAll('#cyber-checklist-body input[type="checkbox"]').forEach(cb => {
+            document.querySelectorAll('#cyber-checklist-body input.cyber-checkbox').forEach(cb => {
                 const key = cb.dataset.key;
-                cb.checked = !!state[key];
-                const span = cb.closest('label')?.querySelector('span');
-                if (span) {
-                    span.style.textDecoration = cb.checked ? 'line-through' : 'none';
-                    span.style.color = cb.checked ? '#9CA3AF' : 'inherit';
+                const isDone = !!state[key];
+                cb.checked = isDone;
+                const label = cb.closest('label');
+                const textSpan = label ? label.querySelector('.cyber-item-text') : null;
+                if (textSpan) {
+                    textSpan.style.textDecoration = isDone ? 'line-through' : 'none';
+                    textSpan.style.color = isDone ? '#9CA3AF' : 'inherit';
                 }
             });
+
+            document.querySelectorAll('.cyber-step-badge').forEach(badge => {
+                const key = badge.dataset.badge;
+                badge.classList.toggle('done', !!state[key]);
+            });
+        }
+
+        function renderCyberRuleCard(item, si, ii) {
+            return `
+                <label class="cyber-rule-card">
+                    <input type="checkbox" class="cyber-checkbox" data-key="${si}-${ii}" onchange="toggleCyberItem('${si}-${ii}')">
+                    <span class="cyber-item-text" style="font-weight:600;line-height:1.4;">${escapeHtml(item)}</span>
+                </label>
+            `;
+        }
+
+        function renderCyberStepItem(item, si, ii, color) {
+            return `
+                <label class="cyber-step-item">
+                    <span class="cyber-step-badge" style="background:${color};" data-badge="${si}-${ii}">${ii + 1}</span>
+                    <span style="display:flex;align-items:center;gap:0.6rem;flex:1;padding-top:4px;">
+                        <input type="checkbox" class="cyber-checkbox" data-key="${si}-${ii}" onchange="toggleCyberItem('${si}-${ii}')">
+                        <span class="cyber-item-text">${escapeHtml(item)}</span>
+                    </span>
+                </label>
+            `;
+        }
+
+        function renderCyberSection(sec, si) {
+            if (sec.tipo === 'reglas') {
+                return `
+                    <div class="card shadow-sm" style="padding:1.5rem;margin-bottom:1.5rem;border-top:5px solid var(--walmart-yellow);">
+                        <h3 style="font-size:1.15rem;margin-bottom:1rem;color:#7a5200;">&#127942; ${escapeHtml(sec.seccion)}</h3>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.85rem;">
+                            ${sec.items.map((item, ii) => renderCyberRuleCard(item, si, ii)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            const color = sec.color || 'var(--walmart-blue)';
+            const icono = color === '#0053e2' ? '&#128269;' : '&#128230;';
+            return `
+                <div class="card shadow-sm" style="padding:1.5rem;margin-bottom:1.5rem;border-top:5px solid ${color};">
+                    <h3 style="font-size:1.15rem;margin-bottom:0.5rem;color:${color};">${icono} ${escapeHtml(sec.seccion)}</h3>
+                    <div>
+                        ${sec.items.map((item, ii) => renderCyberStepItem(item, si, ii, color)).join('')}
+                    </div>
+                </div>
+            `;
         }
 
         function renderCyberChecklist() {
             const meta = CYBER_DATA.meta;
             document.getElementById('cyber-subtitle').innerText =
-                `${meta.nombre} - Del ${meta.fechaInicio} al ${meta.fechaFin}`;
+                `Del ${meta.fechaInicio} al ${meta.fechaFin}`;
 
             document.getElementById('cyber-kpi-venta').innerText = `$${meta.metaVentaMM.toLocaleString('es-CL')}M`;
             document.getElementById('cyber-kpi-venta-sub').innerText = `+${meta.metaVentaVarPct}% vs LY`;
@@ -4106,25 +4245,18 @@
             document.getElementById('cyber-kpi-pedidos-sub').innerText = `+${meta.metaPedidosVarPct}% vs LY`;
             document.getElementById('cyber-kpi-dotacion').innerText = meta.dotacionW40.toLocaleString('es-CL');
 
+            const chipBg = { ACP: '#E3F2FD', PPS: '#FFF3E0', GM: '#E8F5E9' };
+            const chipText = { ACP: '#0053e2', PPS: '#e07000', GM: '#2E7D32' };
             document.getElementById('cyber-foco-body').innerHTML = CYBER_DATA.categoriasFoco.map(c => `
-                <tr style="border-bottom:1px solid #f0f0f0;">
-                    <td style="padding:6px 10px;"><span style="background:#e8f0fe;color:#0053e2;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:700;">${escapeHtml(c.tribu)}</span></td>
-                    <td style="padding:6px 10px;font-weight:600;">${escapeHtml(c.categoria)}</td>
-                    <td style="padding:6px 10px;color:#2a8703;font-weight:700;text-align:right;">${escapeHtml(c.descuento || '-')}</td>
-                </tr>
-            `).join('');
-
-            document.getElementById('cyber-checklist-body').innerHTML = CYBER_DATA.checklist.map((sec, si) => `
-                <div class="card shadow-sm" style="padding:1.25rem;margin-bottom:1rem;">
-                    <h3 style="color:var(--walmart-blue);margin-bottom:0.75rem;font-size:1rem;">${escapeHtml(sec.seccion)}</h3>
-                    ${sec.items.map((item, ii) => `
-                        <label style="display:flex;align-items:flex-start;gap:0.6rem;padding:6px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;">
-                            <input type="checkbox" data-key="${si}-${ii}" onchange="toggleCyberItem('${si}-${ii}')" style="margin-top:3px;flex-shrink:0;">
-                            <span style="font-size:0.9rem;">${escapeHtml(item)}</span>
-                        </label>
-                    `).join('')}
+                <div class="cyber-chip" style="background:${chipBg[c.tribu] || '#F5F5F5'};">
+                    <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.5px;color:${chipText[c.tribu] || '#555'};">${escapeHtml(c.tribu)}</span>
+                    <span style="font-size:0.85rem;font-weight:700;">${escapeHtml(c.categoria)}</span>
+                    ${c.descuento ? `<span style="font-size:0.8rem;font-weight:800;color:#2a8703;">${escapeHtml(c.descuento)}</span>` : ''}
                 </div>
             `).join('');
+
+            document.getElementById('cyber-checklist-body').innerHTML =
+                CYBER_DATA.checklist.map((sec, si) => renderCyberSection(sec, si)).join('');
 
             updateCyberProgress();
         }

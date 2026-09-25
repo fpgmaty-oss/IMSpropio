@@ -4,9 +4,14 @@ build_cyber_tab.py
 Genera/actualiza la pestana "Cyber" (checklist operativo de la campana
 "Barato a un Click") dentro de index.html.
 
-Los datos de CYBER_DATA salen del webinar operativo (17 paginas, extraido
-con pypdf). Si llega una campana nueva (otro Cyber, otras fechas/metas),
-editar el diccionario CYBER_DATA de abajo y volver a correr este script.
+Version 2: recortada a solo 3 secciones (Reglas de Oro, Rutina Alertas NSG,
+Rutina Itemes Futuros) y con un render mas ludico/visual: tarjetas grandes
+para las Reglas de Oro, timeline numerada para las rutinas paso a paso,
+chips de colores para categorias foco, y una barra de progreso animada con
+mensajes segun el avance.
+
+Si llega una campana nueva (otro Cyber, otras fechas/metas), editar el
+diccionario CYBER_DATA de abajo y volver a correr este script.
 
 Uso:
     python build_cyber_tab.py
@@ -42,9 +47,13 @@ CYBER_DATA = {
         {"tribu": "GM", "categoria": "Hidratacion y Conservacion", "descuento": ""},
         {"tribu": "GM", "categoria": "Menaje Cocina", "descuento": ""},
     ],
+    # Solo las 3 secciones mas importantes, elegidas para que sean las
+    # protagonistas del tab (el resto del checklist operativo completo
+    # sigue disponible en el webinar fuente, esto es el "top 3" a la vista).
     "checklist": [
         {
             "seccion": "Reglas de Oro Generales",
+            "tipo": "reglas",
             "items": [
                 "Shoppers: ingreso 7:30 hrs",
                 "Botonera / Reloj Operativo cargado 100% desde el inicio de turno",
@@ -56,45 +65,9 @@ CYBER_DATA = {
             ],
         },
         {
-            "seccion": "Turno Noche (22:00 - 06:30)",
-            "items": [
-                "21:00 - Trabajar itemes futuros",
-                "22:00-22:15 - Reunion de planificacion y entrega de herramientas",
-                "22:15-23:00 - Clasificacion de mercaderia / armado de carros",
-                "23:00-04:30 - Reposicion 4x1",
-                "Ajustes de categorias Top Venta + reposicion estricta de los Nunca Sin",
-                "Doble check en Torre de Control: pedidos PU V09:00 del dia siguiente armados",
-                "Carga de relojes PU y congelado de Gel Packs",
-                "04:30-05:30 - Verificar itemes futuros, identificar quiebres con RF, bajar del bin",
-                "05:30-06:00 - Bineo de excedentes (protocolo Espejeo de Bins)",
-                "06:00-06:30 - Orden y retiro de cartones",
-            ],
-        },
-        {
-            "seccion": "Turno AM (06:30 - 14:00)",
-            "items": [
-                "Asignacion fija de personal en digital AM",
-                "Checklist basico: Reloj, Botonera, Torre, Gel Packs",
-                "Asignar armado de pedidos V9, V11 y V13",
-                "Revision de la Torre cada 1 hora",
-                "Revision de completitud en BI y gestion de quiebres",
-                "12:00 hrs (antes de almuerzo): trabajar itemes futuros",
-            ],
-        },
-        {
-            "seccion": "Turno PM (14:00 - 22:00)",
-            "items": [
-                "Asignacion fija de personal en digital PM",
-                "Checklist basico: Reloj, Botonera, Torre, Gel Packs",
-                "Asignar armado de pedidos V15, V17 y V19",
-                "Reposicion en sala segun demanda",
-                "Revision de la Torre cada 1 hora y de completitud en BI",
-                "17:00-21:00 (Regla de Oro): 1 persona DEDICADA EXCLUSIVAMENTE a entregar "
-                "pedidos Pick-Up (60% de las entregas PU ocurren en este bloque)",
-            ],
-        },
-        {
             "seccion": "Rutina Alertas NSG",
+            "tipo": "pasos",
+            "color": "#0053e2",
             "items": [
                 "07:30-12:30 - Imprimir alertas NSG",
                 "Ingresar a la aplicacion IMS",
@@ -108,6 +81,8 @@ CYBER_DATA = {
         },
         {
             "seccion": "Rutina Itemes Futuros",
+            "tipo": "pasos",
+            "color": "#2E7D32",
             "items": [
                 "Imprimir itemes futuros e itemes top quiebre "
                 "(horarios: 08:00, 11:00, 13:00, 15:00, 17:00, 19:00)",
@@ -116,40 +91,6 @@ CYBER_DATA = {
                 "Personal asignado repone itemes, prioridad en top quiebres",
                 "Priorizar por cantidad de unidades vendidas, trabajar itemes del mismo dia",
                 "Entregar reporte a Gerente de Tienda para definir nuevos focos",
-            ],
-        },
-        {
-            "seccion": "Reunion de Planificacion (diaria)",
-            "items": [
-                "Revisar dotacion vs planificacion (Calculadora)",
-                "Asignacion alertas NSG (Mi Repo) 13:00 a 17:00",
-                "Asignacion itemes futuros 08:00 a 20:00",
-                "Asignacion horneo de pan y pollo",
-                "Asignacion zona de pago",
-                "Caminata sala de ventas: revisar reposicion de itemes top venta de la campana",
-                "Caminata sala de ventas: revisar quiebres visibles",
-            ],
-        },
-        {
-            "seccion": "Rutina Gerente de Tienda",
-            "items": [
-                "07:00-21:00 - Recepcion de camiones",
-                "21:00-22:00 (previo a turno noche) - Posicionamiento de pallets en sala de venta",
-                "21:00-22:00 - Gestion de devoluciones",
-            ],
-        },
-        {
-            "seccion": "Metas / KPI a monitorear a diario",
-            "items": [
-                "Nuevo NSG >= 96%",
-                "Completitud >= 96%",
-                "Pallets por persona >= 4",
-                "Pickup - Armado a tiempo > 96%",
-                "Pickup - Completitud SS > 97% / Completitud CS > 98%",
-                "Pickup - TEP < 5 minutos / % Promesa > 85%",
-                "Home Delivery - Armado a tiempo > 96%",
-                "Home Delivery - Completitud SS > 97% / Completitud CS > 98%",
-                "Home Delivery - OTEA > 96% / Same Day > 90% / N2H > 80%",
             ],
         },
     ],
@@ -198,25 +139,82 @@ def render_js_block():
                 }});
             }});
             const pct = total ? Math.round((done / total) * 100) : 0;
-            document.getElementById('cyber-progress-text').innerText =
-                `${{done}} / ${{total}} tareas completadas (${{pct}}%)`;
+
+            let mensaje = 'Vamos que se puede, arranca marcando la primera tarea';
+            if (pct >= 100) mensaje = 'Local listo para el Cyber. Gran trabajo del equipo &#127881;';
+            else if (pct >= 70) mensaje = 'Ya casi. Los ultimos detalles hacen la diferencia';
+            else if (pct >= 30) mensaje = 'Vas bien encaminado, dale que se puede';
+
+            document.getElementById('cyber-progress-text').innerText = `${{done}} / ${{total}} tareas completadas (${{pct}}%)`;
+            document.getElementById('cyber-progress-msg').innerHTML = mensaje;
             document.getElementById('cyber-progress-bar').style.width = `${{pct}}%`;
 
-            document.querySelectorAll('#cyber-checklist-body input[type="checkbox"]').forEach(cb => {{
+            document.querySelectorAll('#cyber-checklist-body input.cyber-checkbox').forEach(cb => {{
                 const key = cb.dataset.key;
-                cb.checked = !!state[key];
-                const span = cb.closest('label')?.querySelector('span');
-                if (span) {{
-                    span.style.textDecoration = cb.checked ? 'line-through' : 'none';
-                    span.style.color = cb.checked ? '#9CA3AF' : 'inherit';
+                const isDone = !!state[key];
+                cb.checked = isDone;
+                const label = cb.closest('label');
+                const textSpan = label ? label.querySelector('.cyber-item-text') : null;
+                if (textSpan) {{
+                    textSpan.style.textDecoration = isDone ? 'line-through' : 'none';
+                    textSpan.style.color = isDone ? '#9CA3AF' : 'inherit';
                 }}
             }});
+
+            document.querySelectorAll('.cyber-step-badge').forEach(badge => {{
+                const key = badge.dataset.badge;
+                badge.classList.toggle('done', !!state[key]);
+            }});
+        }}
+
+        function renderCyberRuleCard(item, si, ii) {{
+            return `
+                <label class="cyber-rule-card">
+                    <input type="checkbox" class="cyber-checkbox" data-key="${{si}}-${{ii}}" onchange="toggleCyberItem('${{si}}-${{ii}}')">
+                    <span class="cyber-item-text" style="font-weight:600;line-height:1.4;">${{escapeHtml(item)}}</span>
+                </label>
+            `;
+        }}
+
+        function renderCyberStepItem(item, si, ii, color) {{
+            return `
+                <label class="cyber-step-item">
+                    <span class="cyber-step-badge" style="background:${{color}};" data-badge="${{si}}-${{ii}}">${{ii + 1}}</span>
+                    <span style="display:flex;align-items:center;gap:0.6rem;flex:1;padding-top:4px;">
+                        <input type="checkbox" class="cyber-checkbox" data-key="${{si}}-${{ii}}" onchange="toggleCyberItem('${{si}}-${{ii}}')">
+                        <span class="cyber-item-text">${{escapeHtml(item)}}</span>
+                    </span>
+                </label>
+            `;
+        }}
+
+        function renderCyberSection(sec, si) {{
+            if (sec.tipo === 'reglas') {{
+                return `
+                    <div class="card shadow-sm" style="padding:1.5rem;margin-bottom:1.5rem;border-top:5px solid var(--walmart-yellow);">
+                        <h3 style="font-size:1.15rem;margin-bottom:1rem;color:#7a5200;">&#127942; ${{escapeHtml(sec.seccion)}}</h3>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.85rem;">
+                            ${{sec.items.map((item, ii) => renderCyberRuleCard(item, si, ii)).join('')}}
+                        </div>
+                    </div>
+                `;
+            }}
+            const color = sec.color || 'var(--walmart-blue)';
+            const icono = color === '#0053e2' ? '&#128269;' : '&#128230;';
+            return `
+                <div class="card shadow-sm" style="padding:1.5rem;margin-bottom:1.5rem;border-top:5px solid ${{color}};">
+                    <h3 style="font-size:1.15rem;margin-bottom:0.5rem;color:${{color}};">${{icono}} ${{escapeHtml(sec.seccion)}}</h3>
+                    <div>
+                        ${{sec.items.map((item, ii) => renderCyberStepItem(item, si, ii, color)).join('')}}
+                    </div>
+                </div>
+            `;
         }}
 
         function renderCyberChecklist() {{
             const meta = CYBER_DATA.meta;
             document.getElementById('cyber-subtitle').innerText =
-                `${{meta.nombre}} - Del ${{meta.fechaInicio}} al ${{meta.fechaFin}}`;
+                `Del ${{meta.fechaInicio}} al ${{meta.fechaFin}}`;
 
             document.getElementById('cyber-kpi-venta').innerText = `$${{meta.metaVentaMM.toLocaleString('es-CL')}}M`;
             document.getElementById('cyber-kpi-venta-sub').innerText = `+${{meta.metaVentaVarPct}}% vs LY`;
@@ -224,25 +222,18 @@ def render_js_block():
             document.getElementById('cyber-kpi-pedidos-sub').innerText = `+${{meta.metaPedidosVarPct}}% vs LY`;
             document.getElementById('cyber-kpi-dotacion').innerText = meta.dotacionW40.toLocaleString('es-CL');
 
+            const chipBg = {{ ACP: '#E3F2FD', PPS: '#FFF3E0', GM: '#E8F5E9' }};
+            const chipText = {{ ACP: '#0053e2', PPS: '#e07000', GM: '#2E7D32' }};
             document.getElementById('cyber-foco-body').innerHTML = CYBER_DATA.categoriasFoco.map(c => `
-                <tr style="border-bottom:1px solid #f0f0f0;">
-                    <td style="padding:6px 10px;"><span style="background:#e8f0fe;color:#0053e2;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:700;">${{escapeHtml(c.tribu)}}</span></td>
-                    <td style="padding:6px 10px;font-weight:600;">${{escapeHtml(c.categoria)}}</td>
-                    <td style="padding:6px 10px;color:#2a8703;font-weight:700;text-align:right;">${{escapeHtml(c.descuento || '-')}}</td>
-                </tr>
-            `).join('');
-
-            document.getElementById('cyber-checklist-body').innerHTML = CYBER_DATA.checklist.map((sec, si) => `
-                <div class="card shadow-sm" style="padding:1.25rem;margin-bottom:1rem;">
-                    <h3 style="color:var(--walmart-blue);margin-bottom:0.75rem;font-size:1rem;">${{escapeHtml(sec.seccion)}}</h3>
-                    ${{sec.items.map((item, ii) => `
-                        <label style="display:flex;align-items:flex-start;gap:0.6rem;padding:6px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;">
-                            <input type="checkbox" data-key="${{si}}-${{ii}}" onchange="toggleCyberItem('${{si}}-${{ii}}')" style="margin-top:3px;flex-shrink:0;">
-                            <span style="font-size:0.9rem;">${{escapeHtml(item)}}</span>
-                        </label>
-                    `).join('')}}
+                <div class="cyber-chip" style="background:${{chipBg[c.tribu] || '#F5F5F5'}};">
+                    <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.5px;color:${{chipText[c.tribu] || '#555'}};">${{escapeHtml(c.tribu)}}</span>
+                    <span style="font-size:0.85rem;font-weight:700;">${{escapeHtml(c.categoria)}}</span>
+                    ${{c.descuento ? `<span style="font-size:0.8rem;font-weight:800;color:#2a8703;">${{escapeHtml(c.descuento)}}</span>` : ''}}
                 </div>
             `).join('');
+
+            document.getElementById('cyber-checklist-body').innerHTML =
+                CYBER_DATA.checklist.map((sec, si) => renderCyberSection(sec, si)).join('');
 
             updateCyberProgress();
         }}
