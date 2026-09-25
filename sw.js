@@ -1,4 +1,4 @@
-const CACHE_NAME = 'walmart-maestra-v7'; // v7: agrega pestana Categorias Sept
+const CACHE_NAME = 'walmart-maestra-v8'; // v8: agrega pestana Cyber (Barato a un Click)
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
