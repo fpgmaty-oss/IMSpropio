@@ -1,4 +1,4 @@
-const CACHE_NAME = 'walmart-maestra-v10'; // v10: elimina pestana Ventas standalone (redundante)
+const CACHE_NAME = 'walmart-maestra-v11'; // v11: agrega Metas de Campana y seccion Metas KPI en Cyber
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

@@ -1174,6 +1174,19 @@
             transform: scale(1.05);
         }
 
+        .cyber-meta-badge {
+            background: #EDE7F6;
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+            text-align: center;
+            min-width: 130px;
+            transition: transform 0.15s ease;
+        }
+
+        .cyber-meta-badge:hover {
+            transform: scale(1.05);
+        }
+
         .cyber-rule-card {
             background: linear-gradient(135deg, #FFFDF5, #FFF6DC);
             border: 2px solid var(--walmart-yellow);
@@ -1828,7 +1841,9 @@
 
             <div class="card shadow-sm" style="padding:1.25rem;margin-bottom:1.5rem;">
                 <h2 style="margin-bottom:1rem;">&#127942; Categorias Foco de la Campana</h2>
-                <div id="cyber-foco-body" style="display:flex;flex-wrap:wrap;gap:0.75rem;"></div>
+                <div id="cyber-foco-body" style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.25rem;"></div>
+                <h3 style="font-size:0.9rem;color:#6A1B9A;margin-bottom:0.6rem;border-top:1px dashed #E0E0E0;padding-top:1rem;">&#127919; Metas de la Campana</h3>
+                <div id="cyber-metas-campana-body" style="display:flex;flex-wrap:wrap;gap:0.75rem;"></div>
             </div>
 
             <div class="card shadow-sm" style="padding:1.25rem;margin-bottom:1.5rem;">
@@ -3639,6 +3654,32 @@
             "descuento": ""
         }
     ],
+    "metasCampana": [
+        {
+            "label": "Market Share W40",
+            "valor": "5.77%"
+        },
+        {
+            "label": "Market Share W41",
+            "valor": "4.0%"
+        },
+        {
+            "label": "Productos en Campana",
+            "valor": "227"
+        },
+        {
+            "label": "Exclusivos SBA",
+            "valor": "12%"
+        },
+        {
+            "label": "Price Gap vs LMB",
+            "valor": "8.12%"
+        },
+        {
+            "label": "Participacion APP",
+            "valor": "50%"
+        }
+    ],
     "checklist": [
         {
             "seccion": "Reglas de Oro Generales",
@@ -3680,6 +3721,83 @@
                 "Priorizar por cantidad de unidades vendidas, trabajar itemes del mismo dia",
                 "Entregar reporte a Gerente de Tienda para definir nuevos focos"
             ]
+        },
+        {
+            "seccion": "Metas KPI a Monitorear",
+            "tipo": "metas",
+            "grupos": [
+                {
+                    "nombre": "Disponibilidad y Productividad",
+                    "items": [
+                        {
+                            "label": "Nuevo NSG",
+                            "meta": ">= 96%"
+                        },
+                        {
+                            "label": "Completitud",
+                            "meta": ">= 96%"
+                        },
+                        {
+                            "label": "Pallets por persona",
+                            "meta": ">= 4"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Pickup",
+                    "items": [
+                        {
+                            "label": "Armado a tiempo",
+                            "meta": "> 96%"
+                        },
+                        {
+                            "label": "Completitud SS",
+                            "meta": "> 97%"
+                        },
+                        {
+                            "label": "Completitud CS",
+                            "meta": "> 98%"
+                        },
+                        {
+                            "label": "TEP (espera cliente)",
+                            "meta": "< 5 min"
+                        },
+                        {
+                            "label": "% Promesa",
+                            "meta": "> 85%"
+                        }
+                    ]
+                },
+                {
+                    "nombre": "Home Delivery",
+                    "items": [
+                        {
+                            "label": "Armado a tiempo",
+                            "meta": "> 96%"
+                        },
+                        {
+                            "label": "Completitud SS",
+                            "meta": "> 97%"
+                        },
+                        {
+                            "label": "Completitud CS",
+                            "meta": "> 98%"
+                        },
+                        {
+                            "label": "OTEA",
+                            "meta": "> 96%"
+                        },
+                        {
+                            "label": "Same Day",
+                            "meta": "> 90%"
+                        },
+                        {
+                            "label": "N2H",
+                            "meta": "> 80%"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 };
@@ -3713,6 +3831,7 @@
             const state = getCyberChecklistState();
             let total = 0, done = 0;
             CYBER_DATA.checklist.forEach((sec, si) => {
+                if (sec.tipo === 'metas') return; // metas informativas, no son tareas checkeables
                 sec.items.forEach((item, ii) => {
                     total++;
                     if (state[`${si}-${ii}`]) done++;
@@ -3768,6 +3887,27 @@
             `;
         }
 
+        function renderCyberMetasCard(sec) {
+            return `
+                <div class="card shadow-sm" style="padding:1.5rem;margin-bottom:1.5rem;border-top:5px solid #7B1FA2;">
+                    <h3 style="font-size:1.15rem;margin-bottom:1rem;color:#7B1FA2;">&#127919; ${escapeHtml(sec.seccion)}</h3>
+                    ${sec.grupos.map(g => `
+                        <div style="margin-bottom:1rem;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">${escapeHtml(g.nombre)}</div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.6rem;">
+                                ${g.items.map(it => `
+                                    <div class="cyber-meta-badge">
+                                        <div style="font-size:0.7rem;color:#6A1B9A;font-weight:600;">${escapeHtml(it.label)}</div>
+                                        <div style="font-size:1.05rem;font-weight:800;color:#4A148C;">${escapeHtml(it.meta)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         function renderCyberSection(sec, si) {
             if (sec.tipo === 'reglas') {
                 return `
@@ -3778,6 +3918,9 @@
                         </div>
                     </div>
                 `;
+            }
+            if (sec.tipo === 'metas') {
+                return renderCyberMetasCard(sec);
             }
             const color = sec.color || 'var(--walmart-blue)';
             const icono = color === '#0053e2' ? '&#128269;' : '&#128230;';
@@ -3809,6 +3952,13 @@
                     <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.5px;color:${chipText[c.tribu] || '#555'};">${escapeHtml(c.tribu)}</span>
                     <span style="font-size:0.85rem;font-weight:700;">${escapeHtml(c.categoria)}</span>
                     ${c.descuento ? `<span style="font-size:0.8rem;font-weight:800;color:#2a8703;">${escapeHtml(c.descuento)}</span>` : ''}
+                </div>
+            `).join('');
+
+            document.getElementById('cyber-metas-campana-body').innerHTML = CYBER_DATA.metasCampana.map(m => `
+                <div class="cyber-meta-badge">
+                    <div style="font-size:0.7rem;color:#6A1B9A;font-weight:600;">${escapeHtml(m.label)}</div>
+                    <div style="font-size:1.05rem;font-weight:800;color:#4A148C;">${escapeHtml(m.valor)}</div>
                 </div>
             `).join('');
 

@@ -50,6 +50,16 @@ CYBER_DATA = {
         {"tribu": "GM", "categoria": "Hidratacion y Conservacion", "descuento": ""},
         {"tribu": "GM", "categoria": "Menaje Cocina", "descuento": ""},
     ],
+    # Metas de la campana a nivel comercial (pagina 3 del webinar). Se muestran
+    # como chips debajo de las categorias foco, es info de contexto, no tareas.
+    "metasCampana": [
+        {"label": "Market Share W40", "valor": "5.77%"},
+        {"label": "Market Share W41", "valor": "4.0%"},
+        {"label": "Productos en Campana", "valor": "227"},
+        {"label": "Exclusivos SBA", "valor": "12%"},
+        {"label": "Price Gap vs LMB", "valor": "8.12%"},
+        {"label": "Participacion APP", "valor": "50%"},
+    ],
     # Solo las 3 secciones mas importantes, elegidas para que sean las
     # protagonistas del tab (el resto del checklist operativo completo
     # sigue disponible en el webinar fuente, esto es el "top 3" a la vista).
@@ -96,6 +106,41 @@ CYBER_DATA = {
                 "Entregar reporte a Gerente de Tienda para definir nuevos focos",
             ],
         },
+        {
+            "seccion": "Metas KPI a Monitorear",
+            "tipo": "metas",
+            "grupos": [
+                {
+                    "nombre": "Disponibilidad y Productividad",
+                    "items": [
+                        {"label": "Nuevo NSG", "meta": ">= 96%"},
+                        {"label": "Completitud", "meta": ">= 96%"},
+                        {"label": "Pallets por persona", "meta": ">= 4"},
+                    ],
+                },
+                {
+                    "nombre": "Pickup",
+                    "items": [
+                        {"label": "Armado a tiempo", "meta": "> 96%"},
+                        {"label": "Completitud SS", "meta": "> 97%"},
+                        {"label": "Completitud CS", "meta": "> 98%"},
+                        {"label": "TEP (espera cliente)", "meta": "< 5 min"},
+                        {"label": "% Promesa", "meta": "> 85%"},
+                    ],
+                },
+                {
+                    "nombre": "Home Delivery",
+                    "items": [
+                        {"label": "Armado a tiempo", "meta": "> 96%"},
+                        {"label": "Completitud SS", "meta": "> 97%"},
+                        {"label": "Completitud CS", "meta": "> 98%"},
+                        {"label": "OTEA", "meta": "> 96%"},
+                        {"label": "Same Day", "meta": "> 90%"},
+                        {"label": "N2H", "meta": "> 80%"},
+                    ],
+                },
+            ],
+        },
     ],
 }
 
@@ -136,6 +181,7 @@ def render_js_block():
             const state = getCyberChecklistState();
             let total = 0, done = 0;
             CYBER_DATA.checklist.forEach((sec, si) => {{
+                if (sec.tipo === 'metas') return; // metas informativas, no son tareas checkeables
                 sec.items.forEach((item, ii) => {{
                     total++;
                     if (state[`${{si}}-${{ii}}`]) done++;
@@ -191,6 +237,27 @@ def render_js_block():
             `;
         }}
 
+        function renderCyberMetasCard(sec) {{
+            return `
+                <div class="card shadow-sm" style="padding:1.5rem;margin-bottom:1.5rem;border-top:5px solid #7B1FA2;">
+                    <h3 style="font-size:1.15rem;margin-bottom:1rem;color:#7B1FA2;">&#127919; ${{escapeHtml(sec.seccion)}}</h3>
+                    ${{sec.grupos.map(g => `
+                        <div style="margin-bottom:1rem;">
+                            <div style="font-size:0.8rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem;">${{escapeHtml(g.nombre)}}</div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.6rem;">
+                                ${{g.items.map(it => `
+                                    <div class="cyber-meta-badge">
+                                        <div style="font-size:0.7rem;color:#6A1B9A;font-weight:600;">${{escapeHtml(it.label)}}</div>
+                                        <div style="font-size:1.05rem;font-weight:800;color:#4A148C;">${{escapeHtml(it.meta)}}</div>
+                                    </div>
+                                `).join('')}}
+                            </div>
+                        </div>
+                    `).join('')}}
+                </div>
+            `;
+        }}
+
         function renderCyberSection(sec, si) {{
             if (sec.tipo === 'reglas') {{
                 return `
@@ -201,6 +268,9 @@ def render_js_block():
                         </div>
                     </div>
                 `;
+            }}
+            if (sec.tipo === 'metas') {{
+                return renderCyberMetasCard(sec);
             }}
             const color = sec.color || 'var(--walmart-blue)';
             const icono = color === '#0053e2' ? '&#128269;' : '&#128230;';
@@ -235,6 +305,13 @@ def render_js_block():
                 </div>
             `).join('');
 
+            document.getElementById('cyber-metas-campana-body').innerHTML = CYBER_DATA.metasCampana.map(m => `
+                <div class="cyber-meta-badge">
+                    <div style="font-size:0.7rem;color:#6A1B9A;font-weight:600;">${{escapeHtml(m.label)}}</div>
+                    <div style="font-size:1.05rem;font-weight:800;color:#4A148C;">${{escapeHtml(m.valor)}}</div>
+                </div>
+            `).join('');
+
             document.getElementById('cyber-checklist-body').innerHTML =
                 CYBER_DATA.checklist.map((sec, si) => renderCyberSection(sec, si)).join('');
 
@@ -260,7 +337,7 @@ def patch_index(js_block):
 def main():
     js_block = render_js_block()
     patch_index(js_block)
-    total_items = sum(len(s["items"]) for s in CYBER_DATA["checklist"])
+    total_items = sum(len(s["items"]) for s in CYBER_DATA["checklist"] if s["tipo"] != "metas")
     print(f"OK: pestana Cyber regenerada con {len(CYBER_DATA['checklist'])} secciones "
           f"y {total_items} tareas.")
 
